@@ -1,0 +1,12 @@
+<h2>Fighter List</h2>
+
+<p><i>Select a fight from the list to see details.</i></p>
+<ul>
+  <li *ngFor="let fighter of fighters" (click)="selectFighter(fighter)">
+    {{fighter.name}}
+  </li>
+</ul>
+
+<app-fighter-detail *ngIf="selectedFighter" [fighter]="selectedFighter"></app-fighter-detail>
+
+<button (click)="testRestApi()">Test rest-api</button>

@@ -1,0 +1,8 @@
+{
+  "name": "migrations",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "postgres-migrations": "5.3.0"
+  }
+}
