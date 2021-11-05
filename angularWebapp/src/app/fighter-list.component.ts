@@ -25,7 +25,12 @@ export class FighterListComponent implements OnInit {
   }
 
   selectFighter(fighter: Fighter) {
-    this.selectedFighter = fighter;
+    if (this.selectedFighter === fighter) {
+      // deselect
+      this.selectedFighter = undefined;
+    } else {
+      this.selectedFighter = fighter;
+    }
   }
 
   deleteFighter(fighter: Fighter) {

@@ -1,8 +1,8 @@
-<hr>
+<h2>Create Fighter</h2>
 <form [formGroup]="fighterForm" (ngSubmit)="onSubmit()">
 
-  <label for="name">First Name: </label>
+  <label for="name">Name: </label>
   <input id="name" type="text" formControlName="name">
 
-  <button type="submit" [disabled]="!fighterForm.valid">Submit</button>
+  <button type="submit" [disabled]="!fighterForm.valid">Save</button>
 </form>

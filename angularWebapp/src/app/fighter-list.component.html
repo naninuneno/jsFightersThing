@@ -1,8 +1,8 @@
 <h2>Fighter List</h2>
 
-<p><i>Select a fight from the list to see details.</i></p>
+<p><i>Select a fighter from the list to see details.</i></p>
 <ul>
-  <li *ngFor="let fighter of fighters" (click)="selectFighter(fighter)">
+  <li [ngClass]="{'selected': fighter === selectedFighter}" *ngFor="let fighter of fighters" (click)="selectFighter(fighter)">
     {{fighter.name}}
     <span class="delete-fighter" (click)="deleteFighter(fighter)">
       <i class="fa fa-trash"></i>

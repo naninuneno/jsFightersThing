@@ -5,6 +5,9 @@ import { Component } from '@angular/core';
   template: `
     <h1>Fighters Stuff</h1>
     <app-fighter-list></app-fighter-list>
+    <hr>
+    <app-fight-list></app-fight-list>
+    <hr>
     <app-fighter-create></app-fighter-create>
   `
 })

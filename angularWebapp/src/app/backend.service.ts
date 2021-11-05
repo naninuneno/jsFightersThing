@@ -3,6 +3,7 @@ import {Injectable, Type} from '@angular/core';
 import {Logger} from './logger.service';
 import {Fighter} from './fighter';
 import {HttpClient} from '@angular/common/http';
+import {Fight} from './fight';
 
 @Injectable()
 export class BackendService {
@@ -15,6 +16,13 @@ export class BackendService {
       return this.http.get('http://127.0.0.1:3000/fighters', {responseType: 'json'})
         .toPromise()
         .then((fighters: any) => fighters.map((fighter: any) => new Fighter(fighter.id, fighter.name)));
+    }
+    if (type === Fight) {
+      return this.http.get('http://127.0.0.1:3000/fights', {responseType: 'json'})
+        .toPromise()
+        .then((fights: any) => {
+          return fights.map((fight: any) => new Fight(fight.id, fight.fighter1, fight.fighter2, fight.date));
+        });
     }
     const err = new Error('Cannot get object of this type');
     this.logger.error(err);

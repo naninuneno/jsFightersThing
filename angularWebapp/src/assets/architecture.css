@@ -1,3 +1,5 @@
+/* TODO why is this fkn file called architecture */
+
 ul {
   padding-left: 0;
 }
@@ -8,6 +10,11 @@ li {
   background-color: aliceblue;
   border: 1px solid #444;
   margin-bottom: .5rem;
+}
+
+li.selected {
+  background-color: #264D73;
+  color: white;
 }
 
 li:hover {

@@ -1,0 +1,8 @@
+<h2>Fight List</h2>
+
+<p><i>Select a fight from the list to see details.</i></p>
+<ul>
+  <li [ngClass]="{'selected': fight === selectedFight}" *ngFor="let fight of fights" (click)="selectFight(fight)">
+    {{fight.fighter1.name}} vs. {{fight.fighter2.name}}
+  </li>
+</ul>

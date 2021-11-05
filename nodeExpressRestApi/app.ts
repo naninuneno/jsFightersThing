@@ -10,7 +10,7 @@
   const logger = require('morgan');
 
   const FightersRouter = require('./routes/fighters');
-  const UsersRouter = require('./routes/users');
+  const FightsRouter = require('./routes/fights');
 
   const app = express();
 
@@ -33,7 +33,7 @@
   });
 
   app.use('/fighters', new FightersRouter().router);
-  app.use('/users', new UsersRouter().router);
+  app.use('/fights', new FightsRouter().router);
 
 // catch 404 and forward to error handler
   app.use((req: any, res: any, next: any) => {

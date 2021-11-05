@@ -12,6 +12,8 @@ import { HttpClientModule } from '@angular/common/http';
 import {FighterCreateComponent} from './fighter-create.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import {FightersSharedService} from './fighters-shared.service';
+import {FightService} from './fight.service';
+import {FightListComponent} from './fight-list.component';
 
 @NgModule({
   imports: [
@@ -25,11 +27,13 @@ import {FightersSharedService} from './fighters-shared.service';
     FighterDetailComponent,
     FighterCreateComponent,
     FighterListComponent,
+    FightListComponent,
     SalesTaxComponent
   ],
   providers: [
     BackendService,
     FighterService,
+    FightService,
     FightersSharedService,
     Logger
   ],
