@@ -3,5 +3,10 @@
 <div>Id: {{fighter.id}}</div>
 <label for="fighter-name">Name: </label>
 <input type="text" id="fighter-name" [(ngModel)]="fighter.name">
-
-<p>Power: {{fighter.power}}</p>
+<br>
+<br>
+<!-- TODO validate, use angular form -->
+<form (ngSubmit)="onSubmit()">
+<input type="submit" value="Save">
+</form>
+<br>

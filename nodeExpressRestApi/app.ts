@@ -1,5 +1,5 @@
 // TODO better Typescript impl? IIFE used to avoid problems with `require express` in multiple files
-// see index.ts for one "proper" implementation
+// see fighters.ts for one "proper" implementation
 
 (() => {
 
@@ -9,8 +9,8 @@
   const cookieParser = require('cookie-parser');
   const logger = require('morgan');
 
-  const IndexRouter = require('./routes');
-  const usersRouter = require('./routes/users');
+  const FightersRouter = require('./routes/fighters');
+  const UsersRouter = require('./routes/users');
 
   const app = express();
 
@@ -32,8 +32,8 @@
     next();
   });
 
-  app.use('/', new IndexRouter().router);
-  app.use('/users', usersRouter);
+  app.use('/fighters', new FightersRouter().router);
+  app.use('/users', new UsersRouter().router);
 
 // catch 404 and forward to error handler
   app.use((req: any, res: any, next: any) => {

@@ -1,5 +1,8 @@
-Webapp:
-Start - `ng serve`
+### Webapp:
+`ng serve`
 
-Rest-api
-Start - `node ./bin/www`
+### Rest-api
+`npm start`
+
+### Migrator
+`node migrate.js`

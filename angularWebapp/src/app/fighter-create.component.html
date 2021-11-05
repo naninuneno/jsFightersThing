@@ -1,0 +1,8 @@
+<hr>
+<form [formGroup]="fighterForm" (ngSubmit)="onSubmit()">
+
+  <label for="name">First Name: </label>
+  <input id="name" type="text" formControlName="name">
+
+  <button type="submit" [disabled]="!fighterForm.valid">Submit</button>
+</form>

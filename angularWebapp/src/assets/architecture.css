@@ -16,6 +16,14 @@ li:hover {
   cursor: pointer;
 }
 
+span.delete-fighter {
+  float: right;
+}
+
+span.delete-fighter:hover {
+  color: red;
+}
+
 label {
   display: block;
   padding-bottom: .4rem;

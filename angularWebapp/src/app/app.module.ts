@@ -9,22 +9,28 @@ import { FighterService } from './fighter.service';
 import { BackendService } from './backend.service';
 import { Logger } from './logger.service';
 import { HttpClientModule } from '@angular/common/http';
+import {FighterCreateComponent} from './fighter-create.component';
+import { ReactiveFormsModule } from '@angular/forms';
+import {FightersSharedService} from './fighters-shared.service';
 
 @NgModule({
   imports: [
     BrowserModule,
     FormsModule,
-    HttpClientModule
+    HttpClientModule,
+    ReactiveFormsModule
   ],
   declarations: [
     AppComponent,
     FighterDetailComponent,
+    FighterCreateComponent,
     FighterListComponent,
     SalesTaxComponent
   ],
   providers: [
     BackendService,
     FighterService,
+    FightersSharedService,
     Logger
   ],
   bootstrap: [ AppComponent ]

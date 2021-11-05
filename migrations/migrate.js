@@ -1,4 +1,3 @@
-// import {migrate} from "postgres-migrations"
 const migrator = require('postgres-migrations');
 
 // TODO move to env variables or something better

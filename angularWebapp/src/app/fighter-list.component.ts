@@ -1,35 +1,38 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 
-import { Fighter } from './fighter';
-import { FighterService } from './fighter.service';
-import { HttpClient } from '@angular/common/http';
+import {Fighter} from './fighter';
+import {FightersSharedService} from './fighters-shared.service';
+import {Subscription} from 'rxjs';
+import {BackendService} from './backend.service';
 
 @Component({
-  selector:    'app-fighter-list',
-  templateUrl: './fighter-list.component.html',
-  providers:  [ FighterService ]
+  selector: 'app-fighter-list',
+  templateUrl: './fighter-list.component.html'
 })
 export class FighterListComponent implements OnInit {
   fighters: Fighter[] = [];
   selectedFighter: Fighter | undefined;
+  fightersSubscription: Subscription | undefined;
 
-  constructor(private service: FighterService,
-              private http: HttpClient) { }
-
-  ngOnInit() {
-    this.fighters = this.service.getFighters();
+  constructor(private backendService: BackendService,
+              private fightersSharedService: FightersSharedService) {
   }
 
-  selectFighter(fighter: Fighter) { this.selectedFighter = fighter; }
+  ngOnInit() {
+    this.fightersSubscription = this.fightersSharedService.currentFighters
+      .subscribe(fighters => this.fighters = fighters);
+    this.fightersSharedService.updateFighters();
+  }
 
-  testRestApi() {
-    this.http.get('http://127.0.0.1:3000', {responseType: 'text'})
-      .subscribe((data: string) => {
-        console.log('first: ', data);
-      });
-    this.http.get('http://127.0.0.1:3000/users', {responseType: 'text'})
-      .subscribe((data: string) => {
-        console.log('second: ', data);
+  selectFighter(fighter: Fighter) {
+    this.selectedFighter = fighter;
+  }
+
+  deleteFighter(fighter: Fighter) {
+    this.backendService.deleteFighter(fighter)
+      .then(deleted => {
+        console.log('Deleted fighter: ', deleted);
+        this.fightersSharedService.updateFighters();
       });
   }
 }

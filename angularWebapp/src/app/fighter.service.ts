@@ -13,6 +13,7 @@ export class FighterService {
     private logger: Logger) { }
 
   getFighters() {
+    this.fighters = [];
     this.backend.getAll(Fighter).then( (fighters: Fighter[]) => {
       this.logger.log(`Fetched ${fighters.length} fighters.`);
       this.fighters.push(...fighters); // fill cache

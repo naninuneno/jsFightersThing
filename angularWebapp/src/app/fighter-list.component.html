@@ -4,9 +4,10 @@
 <ul>
   <li *ngFor="let fighter of fighters" (click)="selectFighter(fighter)">
     {{fighter.name}}
+    <span class="delete-fighter" (click)="deleteFighter(fighter)">
+      <i class="fa fa-trash"></i>
+    </span>
   </li>
 </ul>
 
 <app-fighter-detail *ngIf="selectedFighter" [fighter]="selectedFighter"></app-fighter-detail>
-
-<button (click)="testRestApi()">Test rest-api</button>

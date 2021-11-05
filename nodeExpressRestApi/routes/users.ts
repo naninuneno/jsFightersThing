@@ -1,12 +1,19 @@
-(() => {
+import * as express from 'express';
 
-  const express = require('express');
-  const router = express.Router();
+class UsersRouter {
 
-  router.get('/', (req: any, res: any, next: any) => {
-    res.send('hitting users route');
-  });
+  router: any;
 
-  module.exports = router;
+  constructor() {
+    this.router = express.Router();
+    this.initRouter();
+  }
 
-})();
+  private initRouter() {
+    this.router.get('/', (req: any, res: any, next: any) => {
+      res.send('Hitting users route');
+    });
+  }
+}
+
+export = UsersRouter;

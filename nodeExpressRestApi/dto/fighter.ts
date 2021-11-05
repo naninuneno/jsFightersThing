@@ -1,4 +1,6 @@
 export class Fighter {
-  constructor(public name: string) {
+  constructor(
+    public id: number,
+    public name: string) {
   }
 }
