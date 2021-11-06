@@ -1,9 +1,9 @@
 import {Injectable, Type} from '@angular/core';
 
 import {Logger} from './logger.service';
-import {Fighter} from './fighter';
+import {Fighter} from './dto/fighter';
 import {HttpClient} from '@angular/common/http';
-import {Fight} from './fight';
+import {Fight} from './dto/fight';
 
 @Injectable()
 export class BackendService {
@@ -48,5 +48,12 @@ export class BackendService {
       {id : fighter.id}, {responseType: 'json'})
       .toPromise()
       .then((deletedFighter: any) => deletedFighter);
+  }
+
+  createFight(fight: Fight): PromiseLike<Fight> {
+    return this.http.post('http://127.0.0.1:3000/fights/create',
+      {fight}, {responseType: 'json'})
+      .toPromise()
+      .then((newFight: any) => newFight);
   }
 }

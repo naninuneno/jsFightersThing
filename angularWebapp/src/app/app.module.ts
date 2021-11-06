@@ -1,34 +1,42 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
+import { NgSelectModule } from '@ng-select/ng-select';
 import { AppComponent } from './app.component';
-import { FighterDetailComponent } from './fighter-detail.component';
-import { FighterListComponent } from './fighter-list.component';
-import { SalesTaxComponent } from './sales-tax.component';
-import { FighterService } from './fighter.service';
+import { FighterDetailComponent } from './fighters/fighter-detail.component';
+import { FighterListComponent } from './fighters/fighter-list.component';
+import { FighterService } from './fighters/fighter.service';
 import { BackendService } from './backend.service';
 import { Logger } from './logger.service';
 import { HttpClientModule } from '@angular/common/http';
-import {FighterCreateComponent} from './fighter-create.component';
+import {FighterCreateComponent} from './fighters/fighter-create.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import {FightersSharedService} from './fighters-shared.service';
-import {FightService} from './fight.service';
-import {FightListComponent} from './fight-list.component';
+import {FightService} from './fights/fight.service';
+import {FightListComponent} from './fights/fight-list.component';
+import {FightDetailComponent} from './fights/fight-detail.component';
+import {FightCreateComponent} from './fights/fight-create.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import {MatExpansionModule} from '@angular/material/expansion';
 
 @NgModule({
-  imports: [
-    BrowserModule,
-    FormsModule,
-    HttpClientModule,
-    ReactiveFormsModule
-  ],
+    imports: [
+        BrowserModule,
+        FormsModule,
+        HttpClientModule,
+        ReactiveFormsModule,
+        NgSelectModule,
+        BrowserAnimationsModule,
+        MatExpansionModule
+    ],
   declarations: [
     AppComponent,
     FighterDetailComponent,
     FighterCreateComponent,
     FighterListComponent,
     FightListComponent,
-    SalesTaxComponent
+    FightDetailComponent,
+    FightCreateComponent
   ],
   providers: [
     BackendService,

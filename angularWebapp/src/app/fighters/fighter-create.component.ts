@@ -1,9 +1,9 @@
 import {Component} from '@angular/core';
 
-import {BackendService} from './backend.service';
+import {BackendService} from '../backend.service';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {Fighter} from './fighter';
-import {FightersSharedService} from './fighters-shared.service';
+import {Fighter} from '../dto/fighter';
+import {FightersSharedService} from '../fighters-shared.service';
 
 @Component({
   selector: 'app-fighter-create',

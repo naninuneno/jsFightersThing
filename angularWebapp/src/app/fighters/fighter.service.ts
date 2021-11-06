@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 
-import { Fighter } from './fighter';
-import { BackendService } from './backend.service';
-import { Logger } from './logger.service';
+import { Fighter } from '../dto/fighter';
+import { BackendService } from '../backend.service';
+import { Logger } from '../logger.service';
 
 @Injectable()
 export class FighterService {

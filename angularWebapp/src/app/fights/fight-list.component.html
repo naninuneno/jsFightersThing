@@ -6,3 +6,5 @@
     {{fight.fighter1.name}} vs. {{fight.fighter2.name}}
   </li>
 </ul>
+
+<app-fight-detail *ngIf="selectedFight" [fight]="selectedFight"></app-fight-detail>

@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import {Fighter} from './fighter';
-import {FighterService} from './fighter.service';
-import {Fight} from './fight';
-import {FightService} from './fight.service';
+import {Fighter} from './dto/fighter';
+import {FighterService} from './fighters/fighter.service';
+import {Fight} from './dto/fight';
+import {FightService} from './fights/fight.service';
 
 @Injectable()
 export class FightersSharedService {

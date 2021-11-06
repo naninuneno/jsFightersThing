@@ -1,0 +1,22 @@
+<h2>Create Fight</h2>
+<form [formGroup]="fightForm" (ngSubmit)="onSubmit()">
+
+  <label for="selectFighter1">Fighter 1: </label>
+  <ng-select id="selectFighter1" [(ngModel)]="selectedFighter1" [ngModelOptions]="{standalone: true}"
+  (ngModelChange)="onFighterChange()">
+    <ng-option *ngFor="let fighter of fighters" [value]="fighter.id">{{fighter.name}}</ng-option>
+  </ng-select>
+
+  <label for="selectFighter2">Fighter 2: </label>
+  <ng-select id="selectFighter2" [(ngModel)]="selectedFighter2" [ngModelOptions]="{standalone: true}"
+             (ngModelChange)="onFighterChange()">
+    <ng-option *ngFor="let fighter of fighters" [value]="fighter.id">{{fighter.name}}</ng-option>
+  </ng-select>
+
+  <label for="date">Date: </label>
+  <input id="date" type="date" formControlName="date" (change)="onDateChange()">
+
+  <br>
+
+  <button type="submit" [disabled]="!isFormValid">Save</button>
+</form>

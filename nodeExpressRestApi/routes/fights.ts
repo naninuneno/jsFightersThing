@@ -22,12 +22,29 @@ class FightsRouter {
       }
     });
 
+    this.router.post('/create', (req: any, res: any, next: any) => {
+      try {
+        const fight: Fight = req.body.fight;
+        createFight(fight, res);
+      } catch (e) {
+        console.error('Critical failure occurred: ' + e);
+        res.send('{ "error": "Critical failure occurred while performing request" }');
+      }
+    });
+
     function getFights(res: any) {
       const query = 'SELECT f.ID, f.fighter_1, f.fighter_2, f.date, f1.name as fighter_1_name, f2.name as fighter_2_name ' +
         'FROM fights f ' +
         'INNER JOIN fighters f1 ON f.fighter_1 = f1.id ' +
         'INNER JOIN fighters f2 ON f.fighter_2 = f2.id;';
       const params = [] as any[];
+
+      executeQueryAndReturnFights(query, params, res);
+    }
+
+    function createFight(fight: Fight, res: any) {
+      const query = 'INSERT INTO fights(fighter_1, fighter_2, date) VALUES ($1, $2, $3) returning *;';
+      const params = [fight.fighter1.id, fight.fighter2.id, fight.date];
 
       executeQueryAndReturnFights(query, params, res);
     }

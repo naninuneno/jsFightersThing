@@ -1,8 +1,8 @@
 import {Component, OnInit} from '@angular/core';
-import {FightersSharedService} from './fighters-shared.service';
+import {FightersSharedService} from '../fighters-shared.service';
 import {Subscription} from 'rxjs';
-import {BackendService} from './backend.service';
-import {Fight} from './fight';
+import {BackendService} from '../backend.service';
+import {Fight} from '../dto/fight';
 
 @Component({
   selector: 'app-fight-list',

@@ -1,7 +1,7 @@
 import {Component, Input} from '@angular/core';
 
-import {Fighter} from './fighter';
-import {BackendService} from './backend.service';
+import {Fighter} from '../dto/fighter';
+import {BackendService} from '../backend.service';
 
 @Component({
   selector: 'app-fighter-detail',
