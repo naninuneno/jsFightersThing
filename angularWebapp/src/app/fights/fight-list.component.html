@@ -4,6 +4,9 @@
 <ul>
   <li [ngClass]="{'selected': fight === selectedFight}" *ngFor="let fight of fights" (click)="selectFight(fight)">
     {{fight.fighter1.name}} vs. {{fight.fighter2.name}}
+    <span class="delete-fighter" (click)="deleteFight(fight)">
+      <i class="fa fa-trash"></i>
+    </span>
   </li>
 </ul>
 

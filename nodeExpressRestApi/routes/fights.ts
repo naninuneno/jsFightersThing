@@ -32,6 +32,16 @@ class FightsRouter {
       }
     });
 
+    this.router.post('/:id/delete', (req: any, res: any, next: any) => {
+      try {
+        const id: number = req.body.id;
+        deleteFight(id, res);
+      } catch (e) {
+        console.error('Critical failure occurred: ' + e);
+        res.send('{ "error": "Critical failure occurred while performing request" }');
+      }
+    });
+
     function getFights(res: any) {
       const query = 'SELECT f.ID, f.fighter_1, f.fighter_2, f.date, f1.name as fighter_1_name, f2.name as fighter_2_name ' +
         'FROM fights f ' +
@@ -45,6 +55,13 @@ class FightsRouter {
     function createFight(fight: Fight, res: any) {
       const query = 'INSERT INTO fights(fighter_1, fighter_2, date) VALUES ($1, $2, $3) returning *;';
       const params = [fight.fighter1.id, fight.fighter2.id, fight.date];
+
+      executeQueryAndReturnFights(query, params, res);
+    }
+
+    function deleteFight(id: number, res: any) {
+      const query = 'DELETE FROM fights WHERE id = $1 returning *;';
+      const params = [id];
 
       executeQueryAndReturnFights(query, params, res);
     }

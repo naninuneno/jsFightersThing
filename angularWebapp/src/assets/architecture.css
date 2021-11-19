@@ -31,6 +31,10 @@ span.delete-fighter:hover {
   color: red;
 }
 
+.formError {
+  color: red;
+}
+
 label {
   display: block;
   padding-bottom: .4rem;

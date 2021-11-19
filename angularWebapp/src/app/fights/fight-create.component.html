@@ -17,6 +17,7 @@
   <input id="date" type="date" formControlName="date" (change)="onDateChange()">
 
   <br>
+  <p class="formError">{{ formError }}</p>
 
   <button type="submit" [disabled]="!isFormValid">Save</button>
 </form>

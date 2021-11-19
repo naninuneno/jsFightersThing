@@ -32,11 +32,11 @@ export class FightListComponent implements OnInit {
     }
   }
 
-  // deleteFight(fighter: Fighter) {
-  //   this.backendService.deleteFight(fighter)
-  //     .then(deleted => {
-  //       console.log('Deleted fight: ', deleted);
-  //       this.fightersSharedService.updateFights();
-  //     });
-  // }
+  deleteFight(fight: Fight) {
+    this.backendService.deleteFight(fight)
+      .then(deleted => {
+        console.log('Deleted fight: ', deleted);
+        this.fightersSharedService.updateFights();
+      });
+  }
 }

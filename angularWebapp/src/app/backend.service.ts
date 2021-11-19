@@ -56,4 +56,11 @@ export class BackendService {
       .toPromise()
       .then((newFight: any) => newFight);
   }
+
+  deleteFight(fight: Fight): PromiseLike<Fight> {
+    return this.http.post('http://127.0.0.1:3000/fights/' + fight.id + '/delete',
+      {id : fight.id}, {responseType: 'json'})
+      .toPromise()
+      .then((deletedFight: any) => deletedFight);
+  }
 }

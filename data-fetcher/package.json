@@ -1,0 +1,15 @@
+{
+  "name": "data-fetcher",
+  "version": "1.0.0",
+  "description": "",
+  "main": "fetch.js",
+  "scripts": {
+    "fetch": "node fetch.js",
+    "delete": "node -e 'require(\"./delete-data.js\").deleteData()'"
+  },
+  "devDependencies": {
+    "axios": "0.24.0",
+    "node-html-parser": "5.1.0",
+    "pg": "8.7.1"
+  }
+}
