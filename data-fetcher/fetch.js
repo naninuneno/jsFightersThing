@@ -49,7 +49,7 @@ axios.get('https://en.wikipedia.org/wiki/List_of_UFC_events')
 
     let i = 0;
     for (const past_event_row of past_event_rows) {
-      if (i++ > 5) {
+      if (i++ > 10) {
         break;
       }
       const event_id = past_event_row.getElementsByTagName('td')[0].innerText.trim();

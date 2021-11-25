@@ -2,6 +2,7 @@ import * as express from 'express';
 import {Fighter} from '../dto/fighter';
 import {Client} from 'pg';
 import {Fight} from '../dto/fight';
+import {Event} from '../dto/event';
 
 class FightsRouter {
 
@@ -43,7 +44,7 @@ class FightsRouter {
     });
 
     function getFights(res: any) {
-      const query = 'SELECT f.ID, f.fighter_1, f.fighter_2, f.date, f1.name as fighter_1_name, f2.name as fighter_2_name ' +
+      const query = 'SELECT f.ID, f.fighter_1, f.fighter_2, f1.name as fighter_1_name, f2.name as fighter_2_name ' +
         'FROM fights f ' +
         'INNER JOIN fighters f1 ON f.fighter_1 = f1.id ' +
         'INNER JOIN fighters f2 ON f.fighter_2 = f2.id;';
@@ -53,8 +54,8 @@ class FightsRouter {
     }
 
     function createFight(fight: Fight, res: any) {
-      const query = 'INSERT INTO fights(fighter_1, fighter_2, date) VALUES ($1, $2, $3) returning *;';
-      const params = [fight.fighter1.id, fight.fighter2.id, fight.date];
+      const query = 'INSERT INTO fights(fighter_1, fighter_2) VALUES ($1, $2) returning *;';
+      const params = [fight.fighter1.id, fight.fighter2.id];
 
       executeQueryAndReturnFights(query, params, res);
     }
@@ -81,7 +82,9 @@ class FightsRouter {
             // TODO ORM would make this + query nicer
             const fighter1 = new Fighter(row.fighter_1, row.fighter_1_name);
             const fighter2 = new Fighter(row.fighter_2, row.fighter_2_name);
-            return new Fight(row.id, fighter1, fighter2, row.date);
+            // TODO get actual event
+            const event = new Event(-1, 'date', 'name');
+            return new Fight(row.id, fighter1, fighter2, '', '', -1, '', event);
           });
           res.send(JSON.stringify(fights));
         }
