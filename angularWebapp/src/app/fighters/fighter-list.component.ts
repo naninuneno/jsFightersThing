@@ -4,6 +4,9 @@ import {Fighter} from '../dto/fighter';
 import {FightersSharedService} from '../fighters-shared.service';
 import {Subscription} from 'rxjs';
 import {BackendService} from '../backend.service';
+import {Fight} from '../dto/fight';
+import {FighterService} from './fighter.service';
+import {FightService} from '../fights/fight.service';
 
 @Component({
   selector: 'app-fighter-list',
@@ -12,10 +15,12 @@ import {BackendService} from '../backend.service';
 export class FighterListComponent implements OnInit {
   fighters: Fighter[] = [];
   selectedFighter: Fighter | undefined;
+  selectedFighterRecentFights: Fight[] | undefined;
   fightersSubscription: Subscription | undefined;
 
   constructor(private backendService: BackendService,
-              private fightersSharedService: FightersSharedService) {
+              private fightersSharedService: FightersSharedService,
+              private fightService: FightService) {
   }
 
   ngOnInit() {
@@ -28,8 +33,11 @@ export class FighterListComponent implements OnInit {
     if (this.selectedFighter === fighter) {
       // deselect
       this.selectedFighter = undefined;
+      this.selectedFighterRecentFights = undefined;
     } else {
       this.selectedFighter = fighter;
+      this.fightService.getRecentFights(fighter)
+        .then(fights => this.selectedFighterRecentFights = fights);
     }
   }
 

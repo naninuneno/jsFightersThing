@@ -2,12 +2,31 @@
 
 <p><i>Select a fighter from the list to see details.</i></p>
 <ul>
-  <li [ngClass]="{'selected': fighter === selectedFighter}" *ngFor="let fighter of fighters" (click)="selectFighter(fighter)">
+  <li [ngClass]="{'selected': fighter === selectedFighter}" *ngFor="let fighter of fighters"
+      (click)="selectFighter(fighter)">
     {{fighter.name}}
     <span class="delete-fighter" (click)="deleteFighter(fighter)">
       <i class="fa fa-trash"></i>
     </span>
+    <app-fighter-detail *ngIf="fighter === selectedFighter" [fighter]="selectedFighter"></app-fighter-detail>
+    <!-- TODO move this into app-fighter-detail -->
+    <ng-container *ngIf="fighter === selectedFighter && selectedFighterRecentFights">
+      <table>
+        <tr *ngFor="let fight of selectedFighterRecentFights">
+          <td>{{fight.event.date | date}}</td>
+          <td>{{fight.weightClass}}</td>
+          <td>{{fight.fighter1.name}} def. {{fight.fighter2.name}} via {{fight.result}}
+            <strong [ngClass]="fighter.id === fight.fighter1.id ? 'win' : 'loss'">
+              ({{fighter.id === fight.fighter1.id ? "Win" : "Loss"}})
+            </strong>
+          </td>
+          <td>R{{fight.round}}, {{fight.time}}</td>
+        </tr>
+      </table>
+    </ng-container>
+    <ng-container *ngIf="fighter === selectedFighter && !selectedFighterRecentFights">
+      <mat-spinner></mat-spinner>
+    </ng-container>
+    <ngb-pagination [collectionSize]="120" [(page)]="page" [maxSize]="5" [rotate]="true" [boundaryLinks]="true"></ngb-pagination>
   </li>
 </ul>
-
-<app-fighter-detail *ngIf="selectedFighter" [fighter]="selectedFighter"></app-fighter-detail>

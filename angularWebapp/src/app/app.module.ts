@@ -18,6 +18,7 @@ import {FightDetailComponent} from './fights/fight-detail.component';
 import {FightCreateComponent} from './fights/fight-create.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {MatExpansionModule} from '@angular/material/expansion';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 @NgModule({
     imports: [
@@ -27,7 +28,8 @@ import {MatExpansionModule} from '@angular/material/expansion';
         ReactiveFormsModule,
         NgSelectModule,
         BrowserAnimationsModule,
-        MatExpansionModule
+        MatExpansionModule,
+        MatProgressSpinnerModule
     ],
   declarations: [
     AppComponent,

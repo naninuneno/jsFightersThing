@@ -3,6 +3,7 @@ import {Injectable} from '@angular/core';
 import {BackendService} from '../backend.service';
 import {Logger} from '../logger.service';
 import {Fight} from '../dto/fight';
+import {Fighter} from '../dto/fighter';
 
 @Injectable()
 export class FightService {
@@ -20,5 +21,9 @@ export class FightService {
       this.fights.push(...fights);
     });
     return this.fights;
+  }
+
+  getRecentFights(fighter: Fighter): PromiseLike<Fight[]> {
+    return this.backend.getRecentFights(fighter);
   }
 }

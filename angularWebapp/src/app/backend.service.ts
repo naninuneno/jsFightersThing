@@ -21,12 +21,23 @@ export class BackendService {
       return this.http.get('http://127.0.0.1:3000/fights', {responseType: 'json'})
         .toPromise()
         .then((fights: any) => {
-          return fights.map((fight: any) => new Fight(fight.id, fight.fighter1, fight.fighter2, fight.date));
+          return fights.map((fight: any) => new Fight(fight.id, fight.fighter1, fight.fighter2,
+            fight.weightClass, fight.result, fight.round, fight.time, fight.event));
         });
     }
     const err = new Error('Cannot get object of this type');
     this.logger.error(err);
     throw err;
+  }
+
+  getRecentFights(fighter: Fighter): PromiseLike<Fight[]> {
+    return this.http.get('http://127.0.0.1:3000/fighters/' + fighter.id + '/recentFights', {responseType: 'json'})
+      .toPromise()
+      .then((fights: any) => {
+        console.log('fs:', fights);
+        return fights.map((fight: any) => new Fight(fight.id, fight.fighter1, fight.fighter2,
+          fight.weightClass, fight.result, fight.round, fight.time, fight.event));
+      });
   }
 
   createFighter(fighter: Fighter): PromiseLike<Fighter> {

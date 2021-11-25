@@ -52,7 +52,7 @@ export class FightCreateComponent {
       throw new TypeError('Couldn\'t find one of the fighters');
     }
 
-    const fight = new Fight(-1, fighter1, fighter2, date);
+    const fight = new Fight(-1, fighter1, fighter2, '', '', -1, '', date);
     this.backendService.createFight(fight)
       .then(created => {
         console.log('Created fight: ', created);

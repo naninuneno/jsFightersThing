@@ -40,3 +40,34 @@ label {
   padding-bottom: .4rem;
   margin-top: 1rem;
 }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 25px 0;
+  font-size: 0.9em;
+  font-family: sans-serif;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+  background-color: white;
+  color: black;
+}
+
+table td {
+  padding: 12px 15px;
+}
+
+table tr {
+  border-bottom: 1px solid #dddddd;
+}
+
+table tr:nth-of-type(even) {
+  background-color: #f3f3f3;
+}
+
+.win {
+  color: green;
+}
+
+.loss {
+  color: darkred;
+}
