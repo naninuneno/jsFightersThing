@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import {Injectable} from '@angular/core';
+import {BehaviorSubject} from 'rxjs';
 import {Fighter} from './dto/fighter';
 import {FighterService} from './fighters/fighter.service';
 import {Fight} from './dto/fight';
@@ -13,11 +13,14 @@ export class FightersSharedService {
   currentFighters = this.fightersSource.asObservable();
   currentFights = this.fightsSource.asObservable();
 
-  constructor(private fighterService: FighterService, private fightService: FightService) { }
+  constructor(private fighterService: FighterService, private fightService: FightService) {
+  }
 
-  updateFighters() {
-    const fighters = this.fighterService.getFighters();
-    this.fightersSource.next(fighters);
+  updateFighters(startIndex: number, count: number, filterValue: string) {
+    this.fighterService.getFighters(startIndex, count, filterValue).then((fighters: Fighter[]) => {
+      console.log(`Fetched ${fighters.length} fighters.`);
+      this.fightersSource.next(fighters);
+    });
   }
 
   updateFights() {

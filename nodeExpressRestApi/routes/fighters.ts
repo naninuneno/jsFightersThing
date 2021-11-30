@@ -18,7 +18,16 @@ class FightersRouter {
   private initRouter() {
     this.router.get('/', (req: any, res: any, next: any) => {
       try {
-        getFighters(res);
+        getFighters(req, res);
+      } catch (e) {
+        console.error('Critical failure occurred: ' + e);
+        res.send('{ "error": "Critical failure occurred while performing request" }');
+      }
+    });
+
+    this.router.get('/count', (req: any, res: any, next: any) => {
+      try {
+        getFightersCount(req, res);
       } catch (e) {
         console.error('Critical failure occurred: ' + e);
         res.send('{ "error": "Critical failure occurred while performing request" }');
@@ -34,8 +43,8 @@ class FightersRouter {
           'INNER JOIN fighters f2 ON f.fighter_2 = f2.id\n' +
           'INNER JOIN events ev ON f.event = ev.id\n' +
           'WHERE f.fighter_1 = $1 OR f.fighter_2 = $1\n' +
-          'ORDER BY ev.date DESC LIMIT 3;';
-        const fightsParams = [req.params.id] as any[];
+          'ORDER BY ev.date DESC LIMIT $2;';
+        const fightsParams = [req.params.id, req.query.count] as any[];
         getRecentFightsForFighter(fightsQuery, fightsParams)
           .then(fights => {
             const fighterIds = new Set();
@@ -108,11 +117,32 @@ class FightersRouter {
       }
     });
 
-    function getFighters(res: any) {
-      const query = 'SELECT id, name FROM fighters;';
-      const params = [] as any[];
+    function getFighters(req: any, res: any) {
+      let query = 'SELECT id, name FROM fighters';
+      let params;
+      if (req.query.filter) {
+        query += ' WHERE name ILIKE $3';
+        params = [req.query.count, req.query.start, '%' + req.query.filter + '%'];
+      } else {
+        params = [req.query.count, req.query.start];
+      }
+      query += ' ORDER BY name LIMIT $1 OFFSET $2;';
 
       executeQueryAndSendFightersInResponse(query, params, res);
+    }
+
+    function getFightersCount(req: any, res: any) {
+      let query = 'SELECT count(*) FROM fighters';
+      let params;
+      if (req.query.filter) {
+        query += ' WHERE name ILIKE $1;';
+        params = ['%' + req.query.filter + '%'];
+      } else {
+        query += ';';
+        params = [] as any[];
+      }
+
+      executeQueryAndSendFighterCount(query, params, res);
     }
 
     function createFighter(fighter: Fighter, res: any) {
@@ -148,6 +178,21 @@ class FightersRouter {
         } else {
           const fighters = response.rows.map((row: any) => new Fighter(row.id, row.name));
           res.send(JSON.stringify(fighters));
+        }
+      });
+    }
+
+    function executeQueryAndSendFighterCount(query: string, params: any[], res: any) {
+      const client = createClient();
+
+      client.connect();
+      client.query(query, params, (err: any, response: any) => {
+        client.end();
+        if (err) {
+          console.log(err);
+          res.send('{ "error": "Unexpected failure while performing request" }');
+        } else {
+          res.send(JSON.stringify(response.rows[0].count));
         }
       });
     }

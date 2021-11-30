@@ -4,7 +4,7 @@ ul {
   padding-left: 0;
 }
 
-li {
+li.fighter {
   list-style-type: none;
   padding: 1rem;
   background-color: aliceblue;
@@ -12,12 +12,12 @@ li {
   margin-bottom: .5rem;
 }
 
-li.selected {
+li.fighter.selected {
   background-color: #264D73;
   color: white;
 }
 
-li:hover {
+li.fighter:hover {
   background-color: #444;
   color: white;
   cursor: pointer;

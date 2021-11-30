@@ -19,14 +19,15 @@ export class FighterCreateComponent {
   });
 
   onSubmit() {
-    const formValue = this.fighterForm.value;
-    console.warn(formValue);
-    const fighter = new Fighter(-1, formValue.name);
-    this.backendService.createFighter(fighter)
-      .then(created => {
-        console.log('Created fighter: ', created);
-        this.fightersSharedService.updateFighters();
-        this.fighterForm.reset();
-      });
+    console.log('possibly redundant unless you\'re seeing this :(');
+    // const formValue = this.fighterForm.value;
+    // console.warn(formValue);
+    // const fighter = new Fighter(-1, formValue.name);
+    // this.backendService.createFighter(fighter)
+    //   .then(created => {
+    //     console.log('Created fighter: ', created);
+    //     this.fightersSharedService.updateFighters();
+    //     this.fighterForm.reset();
+    //   });
   }
 }

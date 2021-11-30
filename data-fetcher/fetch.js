@@ -49,7 +49,7 @@ axios.get('https://en.wikipedia.org/wiki/List_of_UFC_events')
 
     let i = 0;
     for (const past_event_row of past_event_rows) {
-      if (i++ > 10) {
+      if (i++ > 600) {
         break;
       }
       const event_id = past_event_row.getElementsByTagName('td')[0].innerText.trim();
@@ -60,9 +60,13 @@ axios.get('https://en.wikipedia.org/wiki/List_of_UFC_events')
           console.log('Skipping ' + eventUrl + ' - already saved');
         } else {
           const eventName = eventCell.innerText;
-          const eventDateCell = past_event_row.getElementsByTagName('span')[0];
-          // 10 to parse sql-format date e.g. '2021-11-06'
-          const eventDate = new Date(eventDateCell.innerText).toISOString().slice(0, 10);
+          let eventDate;
+          try {
+            eventDate = getEventDate(past_event_row);
+          } catch (RangeError) {
+            console.log('Date parse failure for ' + eventUrl + ' - skipping');
+            continue;
+          }
           console.log('Saving "' + eventName + '" - URL: ' + eventUrl + " - Date: " + eventDate);
           const pool = createPool();
           const eventId = await createEventAndGetId(pool, eventName, eventUrl, eventDate);
@@ -79,6 +83,18 @@ axios.get('https://en.wikipedia.org/wiki/List_of_UFC_events')
   .catch(function (error) {
     console.log(error);
   });
+
+function getEventDate(eventRow) {
+  const eventDateCell = eventRow.getElementsByTagName('span')[0];
+  let eventDate = new Date(eventDateCell.innerText);
+  if (!eventDate.getMonth()) {
+    const eventDateCellBackup = eventRow.getElementsByTagName('td')[2];
+    eventDate = new Date(eventDateCellBackup.innerText);
+  }
+
+  // 10 to parse sql-format date e.g. '2021-11-06'
+  return eventDate.toISOString().slice(0, 10);
+}
 
 // TODO so many async/awaits - surely don't need all of them - learning exercise to find out which are needed
 async function saveEventFights(eventUrl, eventId) {
@@ -127,7 +143,11 @@ async function saveFighters(table, eventId) {
       const fighter2 = getFighter(tableCells[3]);
       const weight_class = getText(tableCells[0]);
       const result = getText(tableCells[4]);
-      const round = getText(tableCells[5]);
+      let round = getText(tableCells[5]);
+      // v. early fights which didn't have rounds
+      if (!round) {
+        round = 0;
+      }
       const time = getText(tableCells[6]);
       if (fighter1 && fighter2) {
         fights.push(new Fight(eventId, fighter1, fighter2, weight_class, result, round, time));

@@ -23,7 +23,7 @@ export class FightService {
     return this.fights;
   }
 
-  getRecentFights(fighter: Fighter): PromiseLike<Fight[]> {
-    return this.backend.getRecentFights(fighter);
+  getRecentFights(fighter: Fighter, count: number): PromiseLike<Fight[]> {
+    return this.backend.getRecentFights(fighter, count);
   }
 }

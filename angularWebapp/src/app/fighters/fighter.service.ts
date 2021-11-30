@@ -1,23 +1,19 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 
-import { Fighter } from '../dto/fighter';
-import { BackendService } from '../backend.service';
-import { Logger } from '../logger.service';
+import {Fighter} from '../dto/fighter';
+import {BackendService} from '../backend.service';
 
 @Injectable()
 export class FighterService {
-  private fighters: Fighter[] = [];
 
   constructor(
-    private backend: BackendService,
-    private logger: Logger) { }
+    private backend: BackendService) { }
 
-  getFighters() {
-    this.fighters = [];
-    this.backend.getAll(Fighter).then( (fighters: Fighter[]) => {
-      this.logger.log(`Fetched ${fighters.length} fighters.`);
-      this.fighters.push(...fighters); // fill cache
-    });
-    return this.fighters;
+  getFighters(startIndex: number, count: number, filterValue: string): PromiseLike<Fighter[]> {
+    return this.backend.getFighters(startIndex, count, filterValue);
+  }
+
+  getFightersCount(filterValue: string): PromiseLike<number> {
+    return this.backend.getFightersCount(filterValue);
   }
 }

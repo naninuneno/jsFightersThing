@@ -1,8 +1,10 @@
 <h2>Fighter List</h2>
 
 <p><i>Select a fighter from the list to see details.</i></p>
+<span>Search: </span>
+<input type="text" [(ngModel)]="filterValue" (ngModelChange)="filterChanged($event)">
 <ul>
-  <li [ngClass]="{'selected': fighter === selectedFighter}" *ngFor="let fighter of fighters"
+  <li class="fighter" *ngFor="let fighter of fighters"
       (click)="selectFighter(fighter)">
     {{fighter.name}}
     <span class="delete-fighter" (click)="deleteFighter(fighter)">
@@ -27,6 +29,7 @@
     <ng-container *ngIf="fighter === selectedFighter && !selectedFighterRecentFights">
       <mat-spinner></mat-spinner>
     </ng-container>
-<!--    <ngb-pagination [collectionSize]="120" [(page)]="page" [maxSize]="5" [rotate]="true" [boundaryLinks]="true"></ngb-pagination>-->
   </li>
+  <ngb-pagination [collectionSize]="collectionSize" [pageSize]="pageSize" [(page)]="page" (pageChange)="updatePage($event)"
+                  [maxSize]="5" [rotate]="true" [boundaryLinks]="true"></ngb-pagination>
 </ul>
