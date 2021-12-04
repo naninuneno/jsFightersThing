@@ -13,6 +13,31 @@
     <app-fighter-detail *ngIf="fighter === selectedFighter" [fighter]="selectedFighter"></app-fighter-detail>
     <!-- TODO move this into app-fighter-detail -->
     <ng-container *ngIf="fighter === selectedFighter && selectedFighterRecentFights">
+      <p>Wins breakdown:</p>
+      <table>
+        <tr>
+          <th>Type</th>
+          <th>Count</th>
+          <th>%</th>
+        </tr>
+        <tr>
+          <td>KO</td>
+          <td>{{fighter.koResultCount}}</td>
+          <td>{{fighter.koResultPercentage}}</td>
+        </tr>
+        <tr>
+          <td>Submission</td>
+          <td>{{fighter.subResultCount}}</td>
+          <td>{{fighter.subResultPercentage}}</td>
+        </tr>
+        <tr>
+          <td>Decision</td>
+          <td>{{fighter.decResultCount}}</td>
+          <td>{{fighter.decResultPercentage}}</td>
+        </tr>
+      </table>
+
+      <p>Recent fights:</p>
       <table>
         <tr *ngFor="let fight of selectedFighterRecentFights">
           <td>{{fight.event.date | date}}</td>
@@ -30,6 +55,7 @@
       <mat-spinner></mat-spinner>
     </ng-container>
   </li>
-  <ngb-pagination [collectionSize]="collectionSize" [pageSize]="pageSize" [(page)]="page" (pageChange)="updatePage($event)"
+  <ngb-pagination [collectionSize]="collectionSize" [pageSize]="pageSize" [(page)]="page"
+                  (pageChange)="updatePage($event)"
                   [maxSize]="5" [rotate]="true" [boundaryLinks]="true"></ngb-pagination>
 </ul>

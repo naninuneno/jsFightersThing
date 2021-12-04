@@ -35,7 +35,10 @@ export class BackendService {
     const endpoint = `http://127.0.0.1:3000/fighters?start=${startIndex}&count=${count}&filter=${filterValue}`;
     return this.http.get(endpoint, {responseType: 'json'})
       .toPromise()
-      .then((fighters: any) => fighters.map((fighter: any) => new Fighter(fighter.id, fighter.name)));
+      .then((fighters: any) => fighters.map((fighter: any) => new Fighter(fighter.id, fighter.name,
+        fighter.koResultPercentage, fighter.koResultCount,
+        fighter.subResultPercentage, fighter.subResultCount,
+        fighter.decResultPercentage, fighter.decResultCount)));
   }
 
   getFightersCount(filterValue: string): PromiseLike<number> {

@@ -52,7 +52,7 @@ table {
   color: black;
 }
 
-table td {
+table td, table th {
   padding: 12px 15px;
 }
 

@@ -118,10 +118,82 @@ class FightersRouter {
     });
 
     function getFighters(req: any, res: any) {
-      let query = 'SELECT id, name FROM fighters';
+      // let query = 'SELECT id, name FROM fighters';
+
+      // TODO problem: will return 3 rows for each fighter, for Decision, KO, and Submission values
+      let query =
+      '-- 2 CTEs (common table expressions) to be able to perform operations not possible within a single query (e.g. group by columns created by the query)\n' +
+        'WITH \n' +
+        'result_pcts AS (\n' +
+        '  SELECT\n' +
+        '  -- collect count and % for each result type (will result in separate rows for each type, to be consolidated later)\n' +
+        '  CASE \n' +
+        '    WHEN f.result LIKE \'%KO%\' THEN 1\n' +
+        '  END as ko_result,\n' +
+        '  CASE \n' +
+        '    WHEN f.result LIKE \'%Submission%\' THEN 1\n' +
+        '  END as sub_result,\n' +
+        '  CASE\n' +
+        '    WHEN f.result LIKE \'%Decision%\' THEN 1\n' +
+        '  END as dec_result,\n' +
+        '  f.fighter_1,\n' +
+        '  fx.name,\n' +
+        '  ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER(PARTITION BY f.fighter_1), 2) AS result_percentage,\n' +
+        '  COUNT(*) AS result_count\n' +
+        '  FROM fights f\n' +
+        '  INNER JOIN fighters fx ON f.fighter_1 = fx.id\n' +
+        '  GROUP BY fighter_1, name, ko_result, sub_result, dec_result\n' +
+        '),\n' +
+        'result_types_separated AS (\n' +
+        '  SELECT\n' +
+        '      fighter_1,\n' +
+        '      name,\n' +
+        '      ko_result,\n' +
+        '      sub_result,\n' +
+        '      dec_result,\n' +
+        '      result_percentage,\n' +
+        '      result_count,\n' +
+        '\n' +
+        '      -- consolidate counts from row for each result type\n' +
+        '      CASE \n' +
+        '        WHEN ko_result > 0 THEN result_count\n' +
+        '      END as ko_result_count,\n' +
+        '      CASE \n' +
+        '        WHEN sub_result > 0 THEN result_count\n' +
+        '      END as sub_result_count,\n' +
+        '      CASE \n' +
+        '        WHEN dec_result > 0 THEN result_count\n' +
+        '      END as dec_result_count,\n' +
+        '\n' +
+        '      -- consolidate %s from row for each result type\n' +
+        '      CASE \n' +
+        '        WHEN ko_result > 0 THEN result_percentage\n' +
+        '      END as ko_result_pct,\n' +
+        '      CASE \n' +
+        '        WHEN sub_result > 0 THEN result_percentage\n' +
+        '      END as sub_result_pct,\n' +
+        '      CASE \n' +
+        '        WHEN dec_result > 0 THEN result_percentage\n' +
+        '      END as dec_result_pct\n' +
+        '  FROM \n' +
+        '      result_pcts\n' +
+        ')\n' +
+        'SELECT \n' +
+        '  fighter_1 as id, \n' +
+        '  name, \n' +
+        '  -- coalesce = default value if null\n' +
+        '  coalesce(max(ko_result_count), 0) as ko_result_count, \n' +
+        '  coalesce(max(ko_result_pct), 0) as ko_result_pct, \n' +
+        '  coalesce(max(sub_result_count), 0) as sub_result_count, \n' +
+        '  coalesce(max(sub_result_pct), 0) as sub_result_pct, \n' +
+        '  coalesce(max(dec_result_count), 0) as dec_result_count, \n' +
+        '  coalesce(max(dec_result_pct), 0) as dec_result_pct\n' +
+        'FROM result_types_separated\n' +
+        'GROUP BY fighter_1, name';
       let params;
+
       if (req.query.filter) {
-        query += ' WHERE name ILIKE $3';
+        query += ' HAVING name ILIKE $3';
         params = [req.query.count, req.query.start, '%' + req.query.filter + '%'];
       } else {
         params = [req.query.count, req.query.start];
@@ -176,7 +248,11 @@ class FightersRouter {
           console.log(err);
           res.send('{ "error": "Unexpected failure while performing request" }');
         } else {
-          const fighters = response.rows.map((row: any) => new Fighter(row.id, row.name));
+          console.log('resp: ', response.rows[0]);
+          const fighters = response.rows.map((row: any) => new Fighter(row.id, row.name,
+            row.ko_result_pct, row.ko_result_count,
+            row.sub_result_pct, row.sub_result_count,
+            row.dec_result_pct, row.dec_result_count));
           res.send(JSON.stringify(fighters));
         }
       });
