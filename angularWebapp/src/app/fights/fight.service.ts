@@ -4,6 +4,7 @@ import {BackendService} from '../backend.service';
 import {Logger} from '../logger.service';
 import {Fight} from '../dto/fight';
 import {Fighter} from '../dto/fighter';
+import {ResultBreakdown} from '../dto/result-breakdown';
 
 @Injectable()
 export class FightService {
@@ -25,5 +26,15 @@ export class FightService {
 
   getRecentFights(fighter: Fighter, count: number): PromiseLike<Fight[]> {
     return this.backend.getRecentFights(fighter, count);
+  }
+
+  getResultBreakdown(fighter: Fighter, isWins: boolean, options?: { endDate?: string }): PromiseLike<ResultBreakdown> {
+    let endDate = options?.endDate;
+    if (!endDate) {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      endDate = tomorrow.toISOString().split('T')[0];
+    }
+    return this.backend.getResultBreakdown(fighter, isWins, endDate);
   }
 }

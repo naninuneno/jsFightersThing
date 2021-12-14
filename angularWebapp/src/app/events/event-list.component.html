@@ -1,0 +1,26 @@
+<ul>
+  <li class="event" *ngFor="let event of events"
+      (click)="selectEvent(event)">
+    {{event.name}}
+    <ng-container *ngIf="event === selectedEvent">
+      <p></p>
+      <p>{{event.name}} - {{event.date | date}}</p>
+      <table>
+        <tr *ngFor="let fight of selectedEventFights">
+          <td>{{fight.fight.weightClass}}</td>
+          <td>{{fight.fight.fighter1.name}} def. {{fight.fight.fighter2.name}} via {{fight.fight.result}}</td>
+          <td>R{{fight.fight.round}}, {{fight.fight.time}}</td>
+          <td>Fighter 1 Weights: {{fight.fighter1SummedWeight | number : '1.2'}}
+            ({{fight.fighter1KoWeight | number : '1.2'}} +
+            {{fight.fighter1SubWeight | number : '1.2'}} +
+            {{fight.fighter1DecWeight | number : '1.2'}})</td>
+          <td>Fighter 2 Weights: {{fight.fighter2SummedWeight | number : '1.2'}}
+            ({{fight.fighter2KoWeight | number : '1.2'}} +
+            {{fight.fighter2SubWeight | number : '1.2'}} +
+            {{fight.fighter2DecWeight | number : '1.2'}})</td>
+          <td>{{fight.predictionCorrect ? 'YES' : 'NO'}}</td>
+        </tr>
+      </table>
+    </ng-container>
+  </li>
+</ul>

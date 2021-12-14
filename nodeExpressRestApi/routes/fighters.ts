@@ -4,14 +4,17 @@ import {Client} from 'pg';
 import * as express from 'express';
 import {Event} from '../dto/event';
 import {Fight} from '../dto/fight';
-import {DbFight} from '../dto/fight_db';
+import {ResultBreakdown} from '../dto/result-breakdown';
+import {FightQuery} from '../db/fight-query';
 
 class FightersRouter {
 
   router: any;
+  fightQuery: FightQuery;
 
   constructor() {
     this.router = express.Router();
+    this.fightQuery = new FightQuery();
     this.initRouter();
   }
 
@@ -45,38 +48,48 @@ class FightersRouter {
           'WHERE f.fighter_1 = $1 OR f.fighter_2 = $1\n' +
           'ORDER BY ev.date DESC LIMIT $2;';
         const fightsParams = [req.params.id, req.query.count] as any[];
-        getRecentFightsForFighter(fightsQuery, fightsParams)
-          .then(fights => {
-            const fighterIds = new Set();
-            const eventIds = new Set();
-            fights.forEach(fight => {
-              fighterIds.add(fight.fighter1);
-              fighterIds.add(fight.fighter2);
-              eventIds.add(fight.event);
-            });
+        this.fightQuery.getFights(fightsQuery, fightsParams)
+          .then(fights => res.send(JSON.stringify(fights)))
+          .catch(err => console.log(err));
+      } catch (e) {
+        console.error('Critical failure occurred: ' + e);
+        res.send('{ "error": "Critical failure occurred while performing request" }');
+      }
+    });
 
-            const fightersQuery = 'SELECT id, name FROM fighters WHERE id = ANY($1::int[])';
-            const fightersParams = [Array.from(fighterIds)];
-            const getFightersQuery = executeQueryAndReturnFighters(fightersQuery, fightersParams);
-            const eventsQuery = 'SELECT id, name, date FROM events WHERE id = ANY($1::int[])';
-            const eventsParams = [Array.from(eventIds)];
-            const getEventsQuery = getEvents(eventsQuery, eventsParams);
-            Promise.all([getFightersQuery, getEventsQuery])
-              .then(responses => {
-                const recentFights = [];
-                for (const fight of fights) {
-                  const fighter1Id = fight.fighter1;
-                  const fighter2Id = fight.fighter2;
-                  const matchingFighter1 = responses[0].filter(f => f.id === fighter1Id)[0];
-                  const matchingFighter2 = responses[0].filter(f => f.id === fighter2Id)[0];
-                  const eventId = fight.event;
-                  const matchingEvent = responses[1].filter(e => e.id === eventId)[0];
-                  recentFights.push(new Fight(fight.id, matchingFighter1, matchingFighter2,
-                    fight.weightClass, fight.result, fight.round, fight.time, matchingEvent));
-                }
-                res.send(JSON.stringify(recentFights));
-              })
-              .catch(err => console.log(err));
+    this.router.get('/:id/results', (req: any, res: any, next: any) => {
+      try {
+        const fighterTypeForQuery = req.query.isWins === 'true' ? 'fighter_1' : 'fighter_2';
+        const fightsQuery = `
+          WITH result_pcts AS (
+            SELECT CASE
+                     WHEN f.result LIKE '%KO%' THEN 'KO'
+                     WHEN f.result LIKE '%Submission%' THEN 'Submission'
+                     WHEN f.result LIKE '%Decision%' THEN 'Decision'
+                     WHEN f.result LIKE '%' THEN 'Other'
+                     END                                                                      AS result_type,
+                   f.${fighterTypeForQuery},
+                   fx.name,
+                   ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (PARTITION BY f.${fighterTypeForQuery}), 2) AS result_percentage,
+                   COUNT(*)                                                                   AS result_count
+            FROM fights f
+                   INNER JOIN fighters fx ON f.${fighterTypeForQuery} = fx.id
+                   INNER JOIN events ev ON f.event = ev.id
+            WHERE ev.date < $2::date
+            GROUP BY ${fighterTypeForQuery}, fx.name, result_type
+          )
+          SELECT ${fighterTypeForQuery},
+                 name,
+                 result_type,
+                 result_percentage,
+                 result_count
+          FROM result_pcts
+          WHERE ${fighterTypeForQuery} = $1;`;
+        const fightsParams = [req.params.id, req.query.endDate] as any[];
+        getResultsForFighter(fightsQuery, fightsParams)
+          .then(resultBreakdown => {
+            console.log('x', resultBreakdown);
+            res.send(JSON.stringify(resultBreakdown));
           })
           .catch(err => console.log(err));
       } catch (e) {
@@ -118,82 +131,11 @@ class FightersRouter {
     });
 
     function getFighters(req: any, res: any) {
-      // let query = 'SELECT id, name FROM fighters';
-
-      // TODO problem: will return 3 rows for each fighter, for Decision, KO, and Submission values
-      let query =
-      '-- 2 CTEs (common table expressions) to be able to perform operations not possible within a single query (e.g. group by columns created by the query)\n' +
-        'WITH \n' +
-        'result_pcts AS (\n' +
-        '  SELECT\n' +
-        '  -- collect count and % for each result type (will result in separate rows for each type, to be consolidated later)\n' +
-        '  CASE \n' +
-        '    WHEN f.result LIKE \'%KO%\' THEN 1\n' +
-        '  END as ko_result,\n' +
-        '  CASE \n' +
-        '    WHEN f.result LIKE \'%Submission%\' THEN 1\n' +
-        '  END as sub_result,\n' +
-        '  CASE\n' +
-        '    WHEN f.result LIKE \'%Decision%\' THEN 1\n' +
-        '  END as dec_result,\n' +
-        '  f.fighter_1,\n' +
-        '  fx.name,\n' +
-        '  ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER(PARTITION BY f.fighter_1), 2) AS result_percentage,\n' +
-        '  COUNT(*) AS result_count\n' +
-        '  FROM fights f\n' +
-        '  INNER JOIN fighters fx ON f.fighter_1 = fx.id\n' +
-        '  GROUP BY fighter_1, name, ko_result, sub_result, dec_result\n' +
-        '),\n' +
-        'result_types_separated AS (\n' +
-        '  SELECT\n' +
-        '      fighter_1,\n' +
-        '      name,\n' +
-        '      ko_result,\n' +
-        '      sub_result,\n' +
-        '      dec_result,\n' +
-        '      result_percentage,\n' +
-        '      result_count,\n' +
-        '\n' +
-        '      -- consolidate counts from row for each result type\n' +
-        '      CASE \n' +
-        '        WHEN ko_result > 0 THEN result_count\n' +
-        '      END as ko_result_count,\n' +
-        '      CASE \n' +
-        '        WHEN sub_result > 0 THEN result_count\n' +
-        '      END as sub_result_count,\n' +
-        '      CASE \n' +
-        '        WHEN dec_result > 0 THEN result_count\n' +
-        '      END as dec_result_count,\n' +
-        '\n' +
-        '      -- consolidate %s from row for each result type\n' +
-        '      CASE \n' +
-        '        WHEN ko_result > 0 THEN result_percentage\n' +
-        '      END as ko_result_pct,\n' +
-        '      CASE \n' +
-        '        WHEN sub_result > 0 THEN result_percentage\n' +
-        '      END as sub_result_pct,\n' +
-        '      CASE \n' +
-        '        WHEN dec_result > 0 THEN result_percentage\n' +
-        '      END as dec_result_pct\n' +
-        '  FROM \n' +
-        '      result_pcts\n' +
-        ')\n' +
-        'SELECT \n' +
-        '  fighter_1 as id, \n' +
-        '  name, \n' +
-        '  -- coalesce = default value if null\n' +
-        '  coalesce(max(ko_result_count), 0) as ko_result_count, \n' +
-        '  coalesce(max(ko_result_pct), 0) as ko_result_pct, \n' +
-        '  coalesce(max(sub_result_count), 0) as sub_result_count, \n' +
-        '  coalesce(max(sub_result_pct), 0) as sub_result_pct, \n' +
-        '  coalesce(max(dec_result_count), 0) as dec_result_count, \n' +
-        '  coalesce(max(dec_result_pct), 0) as dec_result_pct\n' +
-        'FROM result_types_separated\n' +
-        'GROUP BY fighter_1, name';
+      let query = 'SELECT id, name FROM fighters';
       let params;
 
       if (req.query.filter) {
-        query += ' HAVING name ILIKE $3';
+        query += ' WHERE name ILIKE $3';
         params = [req.query.count, req.query.start, '%' + req.query.filter + '%'];
       } else {
         params = [req.query.count, req.query.start];
@@ -249,10 +191,7 @@ class FightersRouter {
           res.send('{ "error": "Unexpected failure while performing request" }');
         } else {
           console.log('resp: ', response.rows[0]);
-          const fighters = response.rows.map((row: any) => new Fighter(row.id, row.name,
-            row.ko_result_pct, row.ko_result_count,
-            row.sub_result_pct, row.sub_result_count,
-            row.dec_result_pct, row.dec_result_count));
+          const fighters = response.rows.map((row: any) => new Fighter(row.id, row.name));
           res.send(JSON.stringify(fighters));
         }
       });
@@ -273,19 +212,57 @@ class FightersRouter {
       });
     }
 
-    function getRecentFightsForFighter(query: string, params: any[]): Promise<DbFight[]> {
+    // function getRecentFightsForFighter(query: string, params: any[]): Promise<DbFight[]> {
+    //   const client = createClient();
+    //
+    //   return new Promise<DbFight[]>((resolve, reject) => {
+    //     client.connect();
+    //     client.query(query, params, (err: any, response: any) => {
+    //       client.end();
+    //       if (err) {
+    //         console.log(err);
+    //         reject('Failed to execute query for recent fights');
+    //       } else {
+    //         resolve(response.rows.map((row: any) =>
+    //           new DbFight(row.id, row.fighter_1, row.fighter_2, row.weight_class, row.result, row.round, row.time, row.event)));
+    //       }
+    //     });
+    //   });
+    // }
+
+    function getResultsForFighter(query: string, params: any[]): Promise<ResultBreakdown> {
       const client = createClient();
 
-      return new Promise<DbFight[]>((resolve, reject) => {
+      return new Promise<ResultBreakdown>((resolve, reject) => {
         client.connect();
         client.query(query, params, (err: any, response: any) => {
           client.end();
           if (err) {
             console.log(err);
-            reject('Failed to execute query for recent fights');
+            reject('Failed to execute query for results');
           } else {
-            resolve(response.rows.map((row: any) =>
-              new DbFight(row.id, row.fighter_1, row.fighter_2, row.weight_class, row.result, row.round, row.time, row.event)));
+            let koCount = 0;
+            let subCount = 0;
+            let decCount = 0;
+            let koPercentage = 0;
+            let subPercentage = 0;
+            let decPercentage = 0;
+            for (const row of response.rows) {
+              if (row.result_type === 'KO') {
+                koCount = row.result_count;
+                koPercentage = row.result_percentage;
+              } else if (row.result_type === 'Submission') {
+                subCount = row.result_count;
+                subPercentage = row.result_percentage;
+              } else if (row.result_type === 'Decision') {
+                decCount = row.result_count;
+                decPercentage = row.result_percentage;
+              } else {
+                console.log('Other row: ', row);
+              }
+            }
+            resolve(
+              new ResultBreakdown(koCount, subCount, decCount, koPercentage, subPercentage, decPercentage));
           }
         });
       });

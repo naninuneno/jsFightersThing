@@ -1,10 +1,8 @@
-/* TODO why is this fkn file called architecture */
-
 ul {
   padding-left: 0;
 }
 
-li.fighter {
+li.fighter, li.event {
   list-style-type: none;
   padding: 1rem;
   background-color: aliceblue;
@@ -12,12 +10,12 @@ li.fighter {
   margin-bottom: .5rem;
 }
 
-li.fighter.selected {
+li.fighter.selected, li.event.selected {
   background-color: #264D73;
   color: white;
 }
 
-li.fighter:hover {
+li.fighter:hover, li.event:hover {
   background-color: #444;
   color: white;
   cursor: pointer;

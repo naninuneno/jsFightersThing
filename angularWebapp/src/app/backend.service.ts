@@ -4,6 +4,8 @@ import {Logger} from './logger.service';
 import {Fighter} from './dto/fighter';
 import {HttpClient} from '@angular/common/http';
 import {Fight} from './dto/fight';
+import {ResultBreakdown} from './dto/result-breakdown';
+import {Event} from './dto/event';
 
 @Injectable()
 export class BackendService {
@@ -35,10 +37,7 @@ export class BackendService {
     const endpoint = `http://127.0.0.1:3000/fighters?start=${startIndex}&count=${count}&filter=${filterValue}`;
     return this.http.get(endpoint, {responseType: 'json'})
       .toPromise()
-      .then((fighters: any) => fighters.map((fighter: any) => new Fighter(fighter.id, fighter.name,
-        fighter.koResultPercentage, fighter.koResultCount,
-        fighter.subResultPercentage, fighter.subResultCount,
-        fighter.decResultPercentage, fighter.decResultCount)));
+      .then((fighters: any) => fighters.map((fighter: any) => new Fighter(fighter.id, fighter.name)));
   }
 
   getFightersCount(filterValue: string): PromiseLike<number> {
@@ -53,10 +52,35 @@ export class BackendService {
     return this.http.get(endpoint, {responseType: 'json'})
       .toPromise()
       .then((fights: any) => {
-        console.log('fs:', fights);
         return fights.map((fight: any) => new Fight(fight.id, fight.fighter1, fight.fighter2,
           fight.weightClass, fight.result, fight.round, fight.time, fight.event));
       });
+  }
+
+  getResultBreakdown(fighter: Fighter, isWins: boolean, endDate: string): PromiseLike<ResultBreakdown> {
+    const endpoint = `http://127.0.0.1:3000/fighters/${fighter.id}/results?isWins=${isWins}&endDate=${endDate}`;
+    return this.http.get(endpoint, {responseType: 'json'})
+      .toPromise()
+      .then((res: any) => {
+        return new ResultBreakdown(
+          res.koCount, res.subCount, res.decCount, res.koPercentage, res.subPercentage, res.decPercentage);
+      });
+  }
+
+  getEvents(): PromiseLike<Event[]> {
+    const endpoint = 'http://127.0.0.1:3000/events';
+    return this.http.get(endpoint, {responseType: 'json'})
+      .toPromise()
+      .then((events: any) => events.map((event: any) => new Event(event.id, event.date, event.name)));
+  }
+
+  getEventFights(event: Event): PromiseLike<Fight[]> {
+    const endpoint = `http://127.0.0.1:3000/events/${event.id}/fights`;
+    return this.http.get(endpoint, {responseType: 'json'})
+      .toPromise()
+      .then((fights: any) =>
+        fights.map((fight: any) => new Fight(fight.id, fight.fighter1, fight.fighter2,
+          fight.weightClass, fight.result, fight.round, fight.time, fight.event)));
   }
 
   createFighter(fighter: Fighter): PromiseLike<Fighter> {

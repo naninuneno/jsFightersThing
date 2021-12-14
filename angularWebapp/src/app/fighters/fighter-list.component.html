@@ -12,7 +12,7 @@
     </span>
     <app-fighter-detail *ngIf="fighter === selectedFighter" [fighter]="selectedFighter"></app-fighter-detail>
     <!-- TODO move this into app-fighter-detail -->
-    <ng-container *ngIf="fighter === selectedFighter && selectedFighterRecentFights">
+    <ng-container *ngIf="fighter === selectedFighter && selectedFighterRecentFights && selectedFighterWinInfo && selectedFighterLossInfo">
       <p>Wins breakdown:</p>
       <table>
         <tr>
@@ -22,18 +22,42 @@
         </tr>
         <tr>
           <td>KO</td>
-          <td>{{fighter.koResultCount}}</td>
-          <td>{{fighter.koResultPercentage}}</td>
+          <td>{{selectedFighterWinInfo.koCount}}</td>
+          <td>{{selectedFighterWinInfo.koPercentage}}</td>
         </tr>
         <tr>
           <td>Submission</td>
-          <td>{{fighter.subResultCount}}</td>
-          <td>{{fighter.subResultPercentage}}</td>
+          <td>{{selectedFighterWinInfo.subCount}}</td>
+          <td>{{selectedFighterWinInfo.subPercentage}}</td>
         </tr>
         <tr>
           <td>Decision</td>
-          <td>{{fighter.decResultCount}}</td>
-          <td>{{fighter.decResultPercentage}}</td>
+          <td>{{selectedFighterWinInfo.decCount}}</td>
+          <td>{{selectedFighterWinInfo.decPercentage}}</td>
+        </tr>
+      </table>
+
+      <p>Losses breakdown:</p>
+      <table>
+        <tr>
+          <th>Type</th>
+          <th>Count</th>
+          <th>%</th>
+        </tr>
+        <tr>
+          <td>KO</td>
+          <td>{{selectedFighterLossInfo.koCount}}</td>
+          <td>{{selectedFighterLossInfo.koPercentage}}</td>
+        </tr>
+        <tr>
+          <td>Submission</td>
+          <td>{{selectedFighterLossInfo.subCount}}</td>
+          <td>{{selectedFighterLossInfo.subPercentage}}</td>
+        </tr>
+        <tr>
+          <td>Decision</td>
+          <td>{{selectedFighterLossInfo.decCount}}</td>
+          <td>{{selectedFighterLossInfo.decPercentage}}</td>
         </tr>
       </table>
 
@@ -51,7 +75,7 @@
         </tr>
       </table>
     </ng-container>
-    <ng-container *ngIf="fighter === selectedFighter && !selectedFighterRecentFights">
+    <ng-container *ngIf="fighter === selectedFighter && !(selectedFighterRecentFights || selectedFighterWinInfo || selectedFighterLossInfo)">
       <mat-spinner></mat-spinner>
     </ng-container>
   </li>

@@ -7,6 +7,7 @@ import {BackendService} from '../backend.service';
 import {Fight} from '../dto/fight';
 import {FightService} from '../fights/fight.service';
 import {FighterService} from './fighter.service';
+import {ResultBreakdown} from '../dto/result-breakdown';
 
 @Component({
   selector: 'app-fighter-list',
@@ -16,6 +17,8 @@ export class FighterListComponent implements OnInit {
   fighters: Fighter[] = [];
   selectedFighter: Fighter | undefined;
   selectedFighterRecentFights: Fight[] | undefined;
+  selectedFighterWinInfo: ResultBreakdown | undefined;
+  selectedFighterLossInfo: ResultBreakdown | undefined;
   fightersSubscription: Subscription | undefined;
   page = 1;
   pageSize = 10;
@@ -44,6 +47,10 @@ export class FighterListComponent implements OnInit {
       this.selectedFighter = fighter;
       this.fightService.getRecentFights(fighter, 100)
         .then(fights => this.selectedFighterRecentFights = fights);
+      this.fightService.getResultBreakdown(fighter, true)
+        .then(results => this.selectedFighterWinInfo = results);
+      this.fightService.getResultBreakdown(fighter, false)
+        .then(results => this.selectedFighterLossInfo = results);
     }
   }
 

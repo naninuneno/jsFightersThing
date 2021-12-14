@@ -11,6 +11,7 @@
 
   const FightersRouter = require('./routes/fighters');
   const FightsRouter = require('./routes/fights');
+  const EventsRouter = require('./routes/events');
 
   const app = express();
 
@@ -34,6 +35,7 @@
 
   app.use('/fighters', new FightersRouter().router);
   app.use('/fights', new FightsRouter().router);
+  app.use('/events', new EventsRouter().router);
 
 // catch 404 and forward to error handler
   app.use((req: any, res: any, next: any) => {

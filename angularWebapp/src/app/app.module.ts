@@ -20,6 +20,8 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MatExpansionModule} from '@angular/material/expansion';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {EventListComponent} from './events/event-list.component';
+import {EventService} from './events/event.service';
 
 @NgModule({
   imports: [
@@ -39,6 +41,7 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
     FighterCreateComponent,
     FighterListComponent,
     FightListComponent,
+    EventListComponent,
     FightDetailComponent,
     FightCreateComponent
   ],
@@ -46,6 +49,7 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
     BackendService,
     FighterService,
     FightService,
+    EventService,
     FightersSharedService,
     Logger
   ],
