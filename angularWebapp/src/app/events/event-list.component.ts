@@ -15,6 +15,11 @@ export class EventListComponent implements OnInit {
   events: Event[] = [];
   selectedEvent: Fighter | undefined;
   selectedEventFights: FightWithPrediction[] | undefined;
+  numberOfEventFights: number | undefined;
+
+  private static weightComparison(winWeighting: number, lossWeighting: number) {
+    return lossWeighting > 0 ? (winWeighting / lossWeighting) : winWeighting / 10;
+  }
 
   constructor(private backendService: BackendService,
               private eventService: EventService,
@@ -36,14 +41,15 @@ export class EventListComponent implements OnInit {
         .then(fights => {
           console.log('Event fights: ', fights);
           this.selectedEventFights = [];
-          for (const fight of fights) {
-            this.calculateFighterResultWeights(fight, event.date);
-          }
+          this.numberOfEventFights = fights.length;
+          const calculateFighterPromises = fights.map(fight => this.calculateFighterResultWeights(fight, event.date));
+          Promise.all(calculateFighterPromises)
+            .then(fightsWithPrediction => fightsWithPrediction.forEach(f => this.selectedEventFights?.push(f)));
         });
     }
   }
 
-  private calculateFighterResultWeights(fight: Fight, eventDate: string) {
+  private calculateFighterResultWeights(fight: Fight, eventDate: string): Promise<FightWithPrediction> {
     const fighter1 = fight.fighter1;
     const fighter2 = fight.fighter2;
     const fighter1WinBreakdownPromise =
@@ -54,82 +60,27 @@ export class EventListComponent implements OnInit {
       this.fightService.getResultBreakdown(fighter2, true, {endDate: eventDate});
     const fighter2LossBreakdownPromise =
       this.fightService.getResultBreakdown(fighter2, false, {endDate: eventDate});
-    Promise.all([
-      fighter1WinBreakdownPromise, fighter1LossBreakdownPromise,
-      fighter2WinBreakdownPromise, fighter2LossBreakdownPromise])
-      .then(results => {
-        const fighter1WinResults = results[0];
-        const fighter1LossResults = results[1];
-        const fighter2WinResults = results[2];
-        const fighter2LossResults = results[3];
+    return new Promise<FightWithPrediction>(resolve => {
+      Promise.all([
+        fighter1WinBreakdownPromise, fighter1LossBreakdownPromise,
+        fighter2WinBreakdownPromise, fighter2LossBreakdownPromise])
+        .then(results => {
+          const fighter1WinResults = results[0];
+          const fighter1LossResults = results[1];
+          const fighter2WinResults = results[2];
+          const fighter2LossResults = results[3];
 
-        const fightWithPrediction = new FightWithPrediction(fight,
-          this.weightComparison(fighter1WinResults.getKoWeighting(), fighter2LossResults.getKoWeighting()),
-          this.weightComparison(fighter1WinResults.getSubWeighting(), fighter2LossResults.getSubWeighting()),
-          this.weightComparison(fighter1WinResults.getDecWeighting(), fighter2LossResults.getDecWeighting()),
-          this.weightComparison(fighter2WinResults.getKoWeighting(), fighter1LossResults.getKoWeighting()),
-          this.weightComparison(fighter2WinResults.getSubWeighting(), fighter1LossResults.getSubWeighting()),
-          this.weightComparison(fighter2WinResults.getDecWeighting(), fighter1LossResults.getDecWeighting()));
-        this.selectedEventFights?.push(fightWithPrediction);
+          const fightWithPrediction = new FightWithPrediction(fight,
+            EventListComponent.weightComparison(fighter1WinResults.getKoWeighting(), fighter2LossResults.getKoWeighting()),
+            EventListComponent.weightComparison(fighter1WinResults.getSubWeighting(), fighter2LossResults.getSubWeighting()),
+            EventListComponent.weightComparison(fighter1WinResults.getDecWeighting(), fighter2LossResults.getDecWeighting()),
+            EventListComponent.weightComparison(fighter2WinResults.getKoWeighting(), fighter1LossResults.getKoWeighting()),
+            EventListComponent.weightComparison(fighter2WinResults.getSubWeighting(), fighter1LossResults.getSubWeighting()),
+            EventListComponent.weightComparison(fighter2WinResults.getDecWeighting(), fighter1LossResults.getDecWeighting()));
 
-        // const fighter1SummedComparisonWeight =
-        //   this.weightComparison(fighter1WinResults.getKoWeighting(), fighter2LossResults.getKoWeighting()) +
-        //   this.weightComparison(fighter1WinResults.getSubWeighting(), fighter2LossResults.getSubWeighting()) +
-        //   this.weightComparison(fighter1WinResults.getDecWeighting(), fighter2LossResults.getDecWeighting());
-        // const fighter2SummedComparisonWeight =
-        //   this.weightComparison(fighter2WinResults.getKoWeighting(), fighter1LossResults.getKoWeighting()) +
-        //   this.weightComparison(fighter2WinResults.getSubWeighting(), fighter1LossResults.getSubWeighting()) +
-        //   this.weightComparison(fighter2WinResults.getDecWeighting(), fighter1LossResults.getDecWeighting());
-        // let fightPredictionBasedOnSummedWeights = 'Prediction based on summed weights: ';
-        // if (fighter1SummedComparisonWeight > fighter2SummedComparisonWeight) {
-        //   const comparisonPercentDiff = (1 - (fighter2SummedComparisonWeight / fighter1SummedComparisonWeight)) * 100;
-        //   fightPredictionBasedOnSummedWeights += 'Fighter 1 win, % certainty: ' + comparisonPercentDiff;
-        // } else if (fighter1SummedComparisonWeight < fighter2SummedComparisonWeight) {
-        //   const comparisonPercentDiff = (1 - (fighter1SummedComparisonWeight / fighter2SummedComparisonWeight)) * 100;
-        //   fightPredictionBasedOnSummedWeights += 'Fighter 2 win, % certainty: ' + comparisonPercentDiff;
-        // } else {
-        //   fightPredictionBasedOnSummedWeights += 'Equal weighting! No certainty over decision';
-        // }
-        //
-        // let comparisonLog = 'Fighter 1: ' + fighter1.name + ' Fighter 2: ' + fighter2.name;
-        // comparisonLog += '\n Fighter 1 summed weight: ' + fighter1SummedComparisonWeight;
-        // comparisonLog += '\n Fighter 2 summed weight: ' + fighter2SummedComparisonWeight;
-        // comparisonLog += '\n ' + fightPredictionBasedOnSummedWeights;
-
-        // comparisonLog += '\n F1 KO result: ' +
-        //   this.weightComparison(fighter1WinResults.getKoWeighting(), fighter2LossResults.getKoWeighting());
-        // comparisonLog += '\n F1 Sub result: ' +
-        //   this.weightComparison(fighter1WinResults.getSubWeighting(), fighter2LossResults.getSubWeighting());
-        // comparisonLog += '\n F1 Dec result: ' +
-        //   this.weightComparison(fighter1WinResults.getDecWeighting(), fighter2LossResults.getDecWeighting());
-        // comparisonLog += '\n F2 KO result: ' +
-        //   this.weightComparison(fighter2WinResults.getKoWeighting(), fighter1LossResults.getKoWeighting());
-        // comparisonLog += '\n F2 Sub result: ' +
-        //   this.weightComparison(fighter2WinResults.getSubWeighting(), fighter1LossResults.getSubWeighting());
-        // comparisonLog += '\n F2 Dec result: ' +
-        //   this.weightComparison(fighter2WinResults.getDecWeighting(), fighter1LossResults.getDecWeighting());
-        // console.log(comparisonLog);
-      });
-    // Promise.all([winBreakdownPromise, lossBreakdownPromise])
-    //   .then(results => {
-    //     let weightLog = 'Fighter: ' + fighter.name;
-    //     weightLog += ' - Win KO weight: ' + results[0].getKoWeighting();
-    //     weightLog += ' - Win Sub weight: ' + results[0].getSubWeighting();
-    //     weightLog += ' - Win Dec weight: ' + results[0].getDecWeighting();
-    //     weightLog += ' - Loss KO weight: ' + results[1].getKoWeighting();
-    //     weightLog += ' - Loss Sub weight: ' + results[1].getSubWeighting();
-    //     weightLog += ' - Loss Dec weight: ' + results[1].getDecWeighting();
-    //     console.log(weightLog);
-    //   });
-  }
-
-  private weightComparison(winWeighting: number, lossWeighting: number) {
-    return lossWeighting > 0 ? (winWeighting / lossWeighting) : winWeighting / 10;
-  }
-
-  private weightComparisonAsStr(winWeighting: number, lossWeighting: number) {
-    const comparisonWeighting = this.weightComparison(winWeighting, lossWeighting);
-    return `win weight: ${winWeighting} - vs other loss weight: ${lossWeighting} - comparison weight: ${comparisonWeighting}`;
+          resolve(fightWithPrediction);
+        });
+    });
   }
 }
 

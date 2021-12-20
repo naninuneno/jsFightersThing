@@ -23,16 +23,14 @@ import {Component} from '@angular/core';
         </mat-expansion-panel-header>
         <app-event-list></app-event-list>
       </mat-expansion-panel>
-<!--      <mat-expansion-panel>-->
-<!--        <mat-expansion-panel-header>-->
-<!--          <mat-panel-title>-->
-<!--            Fights-->
-<!--          </mat-panel-title>-->
-<!--        </mat-expansion-panel-header>-->
-<!--        <app-fight-list></app-fight-list>-->
-<!--        <hr>-->
-<!--        <app-fight-create></app-fight-create>-->
-<!--      </mat-expansion-panel>-->
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Fights
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <app-fight-list></app-fight-list>
+      </mat-expansion-panel>
     </mat-accordion>
   `
 })

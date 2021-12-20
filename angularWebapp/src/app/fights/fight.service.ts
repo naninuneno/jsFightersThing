@@ -17,7 +17,7 @@ export class FightService {
 
   getFights() {
     this.fights = [];
-    this.backend.getAll(Fight).then((fights: Fight[]) => {
+    this.backend.getFights().then((fights: Fight[]) => {
       this.logger.log(`Fetched ${fights.length} fights.`);
       this.fights.push(...fights);
     });

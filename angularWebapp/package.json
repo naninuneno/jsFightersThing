@@ -10,7 +10,10 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "cyopen": "cypress open",
+    "cy": "arch -x86_64 cypress open",
+    "cyrun": "arch -x86_64 cypress run"
   },
   "private": true,
   "dependencies": {
@@ -39,6 +42,8 @@
     "@types/jasmine": "~3.8.0",
     "@types/node": "^12.11.1",
     "codelyzer": "^6.0.0",
+    "cypress": "^9.1.1",
+    "cypress-xpath": "^1.6.2",
     "jasmine-core": "~3.8.0",
     "jasmine-marbles": "~0.8.3",
     "jasmine-spec-reporter": "~7.0.0",

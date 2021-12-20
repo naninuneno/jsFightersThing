@@ -82,11 +82,6 @@
         "named": "never"
       }
     },
-    // TODO(gkalpak): Fix the code and enable this.
-    // "typedef": [
-    //   true,
-    //   "call-signature"
-    // ],
     "typedef-whitespace": {
       "options": [
         {

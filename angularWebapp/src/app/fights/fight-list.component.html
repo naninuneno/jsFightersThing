@@ -1,8 +1,5 @@
-<h2>Fight List</h2>
-
-<p><i>Select a fight from the list to see details.</i></p>
 <ul>
-  <li [ngClass]="{'selected': fight === selectedFight}" *ngFor="let fight of fights" (click)="selectFight(fight)">
+  <li class="expandable-container" [ngClass]="{'selected': fight === selectedFight}" *ngFor="let fight of fights" (click)="selectFight(fight)">
     {{fight.fighter1.name}} vs. {{fight.fighter2.name}}
     <span class="delete-fighter" (click)="deleteFight(fight)">
       <i class="fa fa-trash"></i>

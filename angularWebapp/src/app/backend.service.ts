@@ -14,27 +14,18 @@ export class BackendService {
   }
 
   // TODO remove this in favour of specific object type methods
-  getAll(type: Type<any>): PromiseLike<any[]> {
-    if (type === Fighter) {
-      return this.http.get('http://127.0.0.1:3000/fighters', {responseType: 'json'})
-        .toPromise()
-        .then((fighters: any) => fighters.map((fighter: any) => new Fighter(fighter.id, fighter.name)));
-    }
-    if (type === Fight) {
-      return this.http.get('http://127.0.0.1:3000/fights', {responseType: 'json'})
-        .toPromise()
-        .then((fights: any) => {
-          return fights.map((fight: any) => new Fight(fight.id, fight.fighter1, fight.fighter2,
-            fight.weightClass, fight.result, fight.round, fight.time, fight.event));
-        });
-    }
-    const err = new Error('Cannot get object of this type');
-    this.logger.error(err);
-    throw err;
+  getFights(): PromiseLike<Fight[]> {
+    return this.http.get('http://127.0.0.1:3000/fights', {responseType: 'json'})
+      .toPromise()
+      .then((fights: any) => {
+        return fights.map((fight: any) => new Fight(fight.id, fight.fighter1, fight.fighter2,
+          fight.weightClass, fight.result, fight.round, fight.time, fight.event));
+      });
   }
 
   getFighters(startIndex: number, count: number, filterValue: string): PromiseLike<Fighter[]> {
     const endpoint = `http://127.0.0.1:3000/fighters?start=${startIndex}&count=${count}&filter=${filterValue}`;
+    console.log(endpoint);
     return this.http.get(endpoint, {responseType: 'json'})
       .toPromise()
       .then((fighters: any) => fighters.map((fighter: any) => new Fighter(fighter.id, fighter.name)));

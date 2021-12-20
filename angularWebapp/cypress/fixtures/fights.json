@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "fighter1": {
+      "id": 1,
+      "name": "Max Holloway"
+    },
+    "fighter2": {
+      "id": 2,
+      "name": "Yair Rodríguez"
+    },
+    "weightClass": "",
+    "result": "",
+    "round": -1,
+    "time": "",
+    "event": {
+      "id": -1,
+      "date": "date",
+      "name": "name"
+    }
+  },
+  {
+    "id": 2,
+    "fighter1": {
+      "id": 3,
+      "name": "Kevin Lee"
+    },
+    "fighter2": {
+      "id": 4,
+      "name": "Gregor Gillespie"
+    },
+    "weightClass": "",
+    "result": "",
+    "round": -1,
+    "time": "",
+    "event": {
+      "id": -1,
+      "date": "date",
+      "name": "name"
+    }
+  }
+]

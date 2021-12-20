@@ -2,7 +2,7 @@ ul {
   padding-left: 0;
 }
 
-li.fighter, li.event {
+li.expandable-container {
   list-style-type: none;
   padding: 1rem;
   background-color: aliceblue;
@@ -10,12 +10,12 @@ li.fighter, li.event {
   margin-bottom: .5rem;
 }
 
-li.fighter.selected, li.event.selected {
+li.expandable-container.selected {
   background-color: #264D73;
   color: white;
 }
 
-li.fighter:hover, li.event:hover {
+li.expandable-container:hover {
   background-color: #444;
   color: white;
   cursor: pointer;

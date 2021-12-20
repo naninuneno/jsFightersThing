@@ -1,11 +1,11 @@
 <ul>
-  <li class="event" *ngFor="let event of events"
+  <li class="expandable-container" *ngFor="let event of events"
       (click)="selectEvent(event)">
     {{event.name}}
     <ng-container *ngIf="event === selectedEvent">
       <p></p>
       <p>{{event.name}} - {{event.date | date}}</p>
-      <table>
+      <table *ngIf="selectedEventFights?.length === numberOfEventFights">
         <tr *ngFor="let fight of selectedEventFights">
           <td>{{fight.fight.weightClass}}</td>
           <td>{{fight.fight.fighter1.name}} def. {{fight.fight.fighter2.name}} via {{fight.fight.result}}</td>
@@ -21,6 +21,9 @@
           <td>{{fight.predictionCorrect ? 'YES' : 'NO'}}</td>
         </tr>
       </table>
+      <ng-container *ngIf="selectedEventFights?.length !== numberOfEventFights">
+        <mat-spinner></mat-spinner>
+      </ng-container>
     </ng-container>
   </li>
 </ul>
