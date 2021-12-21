@@ -14,28 +14,26 @@ const backendServiceSpy: BackendService = {} as any;
 const fightersSharedService: FightersSharedService = {} as any;
 let component: FightListComponent;
 
-beforeEach(() => {
-  // backendServiceSpy = createSpyObj('BackendService', {});
-  // backendServiceSpy.load.and.returnValue(of(mock1))
-  // fightersSharedService = createSpyObj('FightersSharedService', {});
-  // fightersSharedService.getUsers.and.returnValue(of(mock2));
+describe('FightListComponent', () => {
+  beforeEach(() => {
+    // backendServiceSpy = createSpyObj('BackendService', {});
+    // backendServiceSpy.load.and.returnValue(of(mock1))
+    // fightersSharedService = createSpyObj('FightersSharedService', {});
+    // fightersSharedService.getUsers.and.returnValue(of(mock2));
 
-  TestBed.configureTestingModule({
-    providers: [
-      FightListComponent,
-      {provide: BackendService, useValue: backendServiceSpy},
-      {provide: FightersSharedService, useValue: fightersSharedService},
-    ],
+    TestBed.configureTestingModule({
+      providers: [
+        FightListComponent,
+        {provide: BackendService, useValue: backendServiceSpy},
+        {provide: FightersSharedService, useValue: fightersSharedService},
+      ],
+    });
+
+    component = TestBed.inject(FightListComponent);
   });
 
-  component = TestBed.inject(FightListComponent);
-});
-
-describe('FightListComponent', () => {
   it('should select a fight', () => {
-    const fighter = new Fighter(1, 'Name');
-    const event = new Event(1, '', '');
-    const fightToSelect = new Fight(1, fighter, fighter, '', '', 1, '', event);
+    const fightToSelect = createTestFight();
 
     expect(component.selectedFight).toBe(undefined);
 
@@ -43,4 +41,22 @@ describe('FightListComponent', () => {
 
     expect(component.selectedFight).toBe(fightToSelect);
   });
+
+  it('should deselect fight if same fight is selected', () => {
+    const fightToSelect = createTestFight();
+
+    expect(component.selectedFight).toBe(undefined);
+    component.selectFight(fightToSelect);
+    expect(component.selectedFight).toBe(fightToSelect);
+
+    component.selectFight(fightToSelect);
+
+    expect(component.selectedFight).toBe(undefined);
+  });
+
+  function createTestFight() {
+    const fighter = new Fighter(1, 'Name');
+    const event = new Event(1, '', '');
+    return new Fight(1, fighter, fighter, '', '', 1, '', event);
+  }
 });

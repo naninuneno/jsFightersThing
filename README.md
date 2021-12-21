@@ -4,6 +4,10 @@
 `ng serve`
 
 #### Testing
+Unit tests:
+`ng test`
+
+UI tests:
 `npm run cy` or `npm run cyopen`
 
 ### Rest-api
