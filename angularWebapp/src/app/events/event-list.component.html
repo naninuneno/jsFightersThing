@@ -6,19 +6,29 @@
       <p></p>
       <p>{{event.name}} - {{event.date | date}}</p>
       <table *ngIf="selectedEventFights?.length === numberOfEventFights">
+        <tr>
+          <th>Weight</th>
+          <th>Fight</th>
+          <th>Round</th>
+          <th>Fighter 1 Weights</th>
+          <th>Fighter 2 Weights</th>
+          <th>Prediction correct?</th>
+          <th>Prediction diff</th>
+        </tr>
         <tr *ngFor="let fight of selectedEventFights">
           <td>{{fight.fight.weightClass}}</td>
           <td>{{fight.fight.fighter1.name}} def. {{fight.fight.fighter2.name}} via {{fight.fight.result}}</td>
           <td>R{{fight.fight.round}}, {{fight.fight.time}}</td>
-          <td>Fighter 1 Weights: {{fight.fighter1SummedWeight | number : '1.2'}}
+          <td>{{fight.fighter1SummedWeight | number : '1.2'}}
             ({{fight.fighter1KoWeight | number : '1.2'}} +
             {{fight.fighter1SubWeight | number : '1.2'}} +
             {{fight.fighter1DecWeight | number : '1.2'}})</td>
-          <td>Fighter 2 Weights: {{fight.fighter2SummedWeight | number : '1.2'}}
+          <td>{{fight.fighter2SummedWeight | number : '1.2'}}
             ({{fight.fighter2KoWeight | number : '1.2'}} +
             {{fight.fighter2SubWeight | number : '1.2'}} +
             {{fight.fighter2DecWeight | number : '1.2'}})</td>
           <td>{{fight.predictionCorrect ? 'YES' : 'NO'}}</td>
+          <td>x{{fight.predictionDiff | number : '1.2'}}</td>
         </tr>
       </table>
       <ng-container *ngIf="selectedEventFights?.length !== numberOfEventFights">

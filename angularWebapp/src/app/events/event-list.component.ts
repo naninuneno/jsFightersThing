@@ -52,14 +52,20 @@ export class EventListComponent implements OnInit {
   private calculateFighterResultWeights(fight: Fight, eventDate: string): Promise<FightWithPrediction> {
     const fighter1 = fight.fighter1;
     const fighter2 = fight.fighter2;
+    // 2 years, for relevancy
+    const dateTwoYearsAgo = new Date();
+    dateTwoYearsAgo.setDate(dateTwoYearsAgo.getDate() - 730);
+    const startDate = dateTwoYearsAgo.toISOString().split('T')[0];
+    const options = {startDate, endDate: eventDate};
+
     const fighter1WinBreakdownPromise =
-      this.fightService.getResultBreakdown(fighter1, true, {endDate: eventDate});
+      this.fightService.getResultBreakdown(fighter1, true, options);
     const fighter1LossBreakdownPromise =
-      this.fightService.getResultBreakdown(fighter1, false, {endDate: eventDate});
+      this.fightService.getResultBreakdown(fighter1, false, options);
     const fighter2WinBreakdownPromise =
-      this.fightService.getResultBreakdown(fighter2, true, {endDate: eventDate});
+      this.fightService.getResultBreakdown(fighter2, true, options);
     const fighter2LossBreakdownPromise =
-      this.fightService.getResultBreakdown(fighter2, false, {endDate: eventDate});
+      this.fightService.getResultBreakdown(fighter2, false, options);
     return new Promise<FightWithPrediction>(resolve => {
       Promise.all([
         fighter1WinBreakdownPromise, fighter1LossBreakdownPromise,
@@ -88,6 +94,7 @@ class FightWithPrediction {
   public fighter1SummedWeight: number;
   public fighter2SummedWeight: number;
   public predictionCorrect: boolean;
+  public predictionDiff: number;
 
   constructor(public fight: Fight,
               public fighter1KoWeight: number,
@@ -99,5 +106,12 @@ class FightWithPrediction {
     this.fighter1SummedWeight = this.fighter1KoWeight + this.fighter1SubWeight + this.fighter1DecWeight;
     this.fighter2SummedWeight = this.fighter2KoWeight + this.fighter2SubWeight + this.fighter2DecWeight;
     this.predictionCorrect = this.fighter1SummedWeight > this.fighter2SummedWeight;
+    if (this.fighter1SummedWeight === 0 || this.fighter2SummedWeight === 0) {
+      this.predictionDiff = 0;
+    } else if (this.predictionCorrect) {
+      this.predictionDiff = this.fighter1SummedWeight / this.fighter2SummedWeight;
+    } else {
+      this.predictionDiff = this.fighter2SummedWeight / this.fighter1SummedWeight;
+    }
   }
 }

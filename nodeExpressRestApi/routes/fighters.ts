@@ -75,7 +75,7 @@ class FightersRouter {
             FROM fights f
                    INNER JOIN fighters fx ON f.${fighterTypeForQuery} = fx.id
                    INNER JOIN events ev ON f.event = ev.id
-            WHERE ev.date < $2::date
+            WHERE ev.date > $2::date AND ev.date < $3::date
             GROUP BY ${fighterTypeForQuery}, fx.name, result_type
           )
           SELECT ${fighterTypeForQuery},
@@ -85,10 +85,9 @@ class FightersRouter {
                  result_count
           FROM result_pcts
           WHERE ${fighterTypeForQuery} = $1;`;
-        const fightsParams = [req.params.id, req.query.endDate] as any[];
+        const fightsParams = [req.params.id, req.query.startDate, req.query.endDate] as any[];
         getResultsForFighter(fightsQuery, fightsParams)
           .then(resultBreakdown => {
-            console.log('x', resultBreakdown);
             res.send(JSON.stringify(resultBreakdown));
           })
           .catch(err => console.log(err));

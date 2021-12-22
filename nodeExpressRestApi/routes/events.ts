@@ -44,7 +44,7 @@ class EventsRouter {
     });
 
     function getEvents(req: any, res: any) {
-      const query = 'SELECT id, date, name FROM events;';
+      const query = 'SELECT id, date, name FROM events ORDER BY date DESC;';
       const params = [] as any[];
 
       executeQueryAndSendEventsInResponse(query, params, res);

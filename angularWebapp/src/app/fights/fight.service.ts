@@ -28,13 +28,19 @@ export class FightService {
     return this.backend.getRecentFights(fighter, count);
   }
 
-  getResultBreakdown(fighter: Fighter, isWins: boolean, options?: { endDate?: string }): PromiseLike<ResultBreakdown> {
+  getResultBreakdown(fighter: Fighter, isWins: boolean, options?: { startDate?: string, endDate?: string }): PromiseLike<ResultBreakdown> {
+    let startDate = options?.startDate;
     let endDate = options?.endDate;
+    if (!startDate) {
+      const longAgo = new Date();
+      longAgo.setFullYear(1980, 1, 1);
+      startDate = longAgo.toISOString().split('T')[0];
+    }
     if (!endDate) {
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
       endDate = tomorrow.toISOString().split('T')[0];
     }
-    return this.backend.getResultBreakdown(fighter, isWins, endDate);
+    return this.backend.getResultBreakdown(fighter, isWins, startDate, endDate);
   }
 }

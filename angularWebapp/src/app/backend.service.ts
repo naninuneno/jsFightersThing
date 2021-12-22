@@ -48,8 +48,8 @@ export class BackendService {
       });
   }
 
-  getResultBreakdown(fighter: Fighter, isWins: boolean, endDate: string): PromiseLike<ResultBreakdown> {
-    const endpoint = `http://127.0.0.1:3000/fighters/${fighter.id}/results?isWins=${isWins}&endDate=${endDate}`;
+  getResultBreakdown(fighter: Fighter, isWins: boolean, startDate: string, endDate: string): PromiseLike<ResultBreakdown> {
+    const endpoint = `http://127.0.0.1:3000/fighters/${fighter.id}/results?isWins=${isWins}&startDate=${startDate}&endDate=${endDate}`;
     return this.http.get(endpoint, {responseType: 'json'})
       .toPromise()
       .then((res: any) => {

@@ -23,9 +23,10 @@ class Fight {
 }
 
 class Fighter {
-  constructor(name, wiki_url) {
+  constructor(name, wiki_url, hasWikiPage) {
     this.name = name;
     this.wiki_url = wiki_url;
+    this.hasWikiPage = hasWikiPage;
   }
 }
 
@@ -49,7 +50,7 @@ axios.get('https://en.wikipedia.org/wiki/List_of_UFC_events')
 
     let i = 0;
     for (const past_event_row of past_event_rows) {
-      if (i++ > 600) {
+      if (i++ > 200) {
         break;
       }
       const event_id = past_event_row.getElementsByTagName('td')[0].innerText.trim();
@@ -139,9 +140,9 @@ async function saveFighters(table, eventId) {
     i++;
     const tableCells = tableRow.getElementsByTagName('td');
     if (tableCells.length === 8) {
-      const fighter1 = getFighter(tableCells[1]);
-      const fighter2 = getFighter(tableCells[3]);
       const weight_class = getText(tableCells[0]);
+      const fighter1 = getFighter(weight_class, tableCells[1]);
+      const fighter2 = getFighter(weight_class, tableCells[3]);
       const result = getText(tableCells[4]);
       let round = getText(tableCells[5]);
       // v. early fights which didn't have rounds
@@ -151,6 +152,8 @@ async function saveFighters(table, eventId) {
       const time = getText(tableCells[6]);
       if (fighter1 && fighter2) {
         fights.push(new Fight(eventId, fighter1, fighter2, weight_class, result, round, time));
+      } else {
+        console.log('Fighter 1 or 2 not present');
       }
     }
   }
@@ -177,14 +180,19 @@ async function createFighterIfNotExistsAndGetId(pool, existingWikiFighters, figh
   }
 }
 
-function getFighter(tableCell) {
-  const fighterUrlTag = tableCell
-    .getElementsByTagName('a')[0];
-  if (!!fighterUrlTag) {
-    const fighterUrl = fighterUrlTag.getAttribute('href');
-    const fighterName = tableCell.innerText.replace('(c)', '').trim();
-    return new Fighter(fighterName, fighterUrl);
+function getFighter(weight_class, tableCell) {
+  const fighterUrlTag = tableCell.getElementsByTagName('a')[0];
+  const fighterName = tableCell.innerText.replace('(c)', '').trim();
+  let fighterUrl;
+  if (!fighterUrlTag) {
+    // best attempt to mark fighters as unique if they don't have a wiki URL
+    // if 2 fighters both didn't have wiki page AND same name AND same weight class... then fuck that scenario, this is a hobby
+    fighterUrl = fighterName + '_' + weight_class;
+    console.log('No wiki url found for fighter: creating as ', fighterUrl);
+  } else {
+    fighterUrl = fighterUrlTag.getAttribute('href');
   }
+  return new Fighter(fighterName, fighterUrl);
 }
 
 function getText(tableCell) {
